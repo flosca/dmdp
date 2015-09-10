@@ -8,3 +8,9 @@
    :subprotocol "sqlite"
    :subname "db/base_sample.db"})
 
+
+
+#_(defn fill-author-fields!
+  [parsed-map]
+  (insert! db :Author (select-keys parsed-map
+                                   [])))
