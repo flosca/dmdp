@@ -1,6 +1,6 @@
-(ns wrapper.core-test
+(ns arxiv-crawler.core-test
   (:require [clojure.test :refer :all]
-            [wrapper.core :refer :all]))
+            [arxiv-crawler.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."

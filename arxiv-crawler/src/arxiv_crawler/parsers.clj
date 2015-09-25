@@ -1,23 +1,26 @@
-(ns wrapper.parsers
+(ns arxiv-crawler.parsers
   (:require [clojure.xml :as xml]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [arxiv-crawler.api :as api]
+            [arxiv-crawler.database :as db])
+  (:use     [clojure.pprint])) ; TODO delete
 
+(def arxiv (xml/parse "/home/flosca/1000.xml"))
+
+
+; Preparations for parsing clojure collections generated from xml.
 
 (def get-content (mapcat :content))
 
-(defn tagp [pred]
-  (comp get-content (filter (comp pred :tag))))
-
 (defn tag= [tag]
-  (tagp (partial = tag)))
-
+  (comp get-content
+        (filter (comp (partial = tag) :tag))))
 
 (defn get-records-list
   [xmldoc]
     (eduction (comp (tag= :ListRecords)
                     (tag= :record))
                 [xmldoc]))
-
 
 (defn get-token
   [xmldoc]
@@ -28,8 +31,7 @@
         first))
 
 
-;; Parsers:
-(defn get-setSpecs-seq
+(defn get-seq-from-header
   [record]
  (->> [record]
       (eduction (comp (tag= :header)
@@ -38,8 +40,9 @@
 
 (defn get-specifications-list
   [record]
+  (map #(hash-map :specname %)
   (map first (map #(eduction (comp get-content) [%])
-                  (filter #(= :setSpec (:tag %)) (get-setSpecs-seq record)))))
+                  (filter #(= :setSpec (:tag %)) (get-seq-from-header record))))))
 
 
 (defn get-title
@@ -48,6 +51,16 @@
        (eduction (comp (tag= :metadata)
                        (tag= :arXiv)
                        (tag= :title)
+                        get-content))
+       first))
+
+(defn get-uid
+  "Universal id for each article (to download pdf/postscripts)"
+  [record]
+  (->> [record]
+       (eduction (comp (tag= :metadata)
+                       (tag= :arXiv)
+                       (tag= :id)
                         get-content))
        first))
 
@@ -75,7 +88,9 @@
 (let [sq (get-authors-seq record)
       ks (map first (map get-keynames-list sq))
       fs (map first (map get-forenames-list sq))]
-    (zipmap ks fs)))
+    (map #(hash-map :keyname (first %)
+                     :forenames (second %))
+           (zipmap ks fs))))
 
 
 
@@ -146,17 +161,32 @@
 
 
 (defn parse-record
+  "Takes a clojure collection and returns a hsh-map with keys as attributes for tables."
   [record]
-  (hash-map :title (get-title record),
+  (hash-map :uid (get-uid record)
+            :title (get-title record)
             :authors-list (get-authors-list record)
             :category (get-category record)
             :comments (get-comments record)
             :doi (get-doi record)
             :abstract (get-abstract record),
             :specifications-list (get-specifications-list record),
-            :journal (get-journal-ref record)
-            :date-created (get-date-created record)
-            :date-updated (get-date-updated record)))
+            :journal_ref (get-journal-ref record)
+            :date_created (get-date-created record)
+            :date_updated (get-date-updated record)))
 
 
 
+
+(def rec (->> arxiv get-records-list
+                   (map parse-record)))
+
+
+
+
+(defn -main
+  []
+ (pprint
+  #_(:authors-list (first rec))
+  #_(db/record-thousand (drop 10 rec))
+  (nth (map parse-record (get-records-list arxiv)) 15)))
