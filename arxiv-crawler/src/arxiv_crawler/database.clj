@@ -1,6 +1,6 @@
 (ns arxiv-crawler.database
   (:require [clojure.java.jdbc :as sql])
-  (:use     [clojure.string :only (join)]))
+  (:use     [clojure.string :only (join split)]))
 
 
 (def conn {:classname "org.postgresql.Driver"
@@ -9,38 +9,30 @@
            :user "postgres"
            :password "postgres"})
 
+(defn single-q->double
+  [string]
+  (join "''" (split string #"\'")))
+
 (defn author-query
-  [keyname forenames]
-  (str "insert into authors (keyname,forenames) "
-        "select '" keyname "','" forenames
-        "' where not exists "
-        "(select id, keyname, forenames "
-        "from authors "
-        "where keyname = '" keyname
-        "' and forenames = '" forenames
-        "') returning id"))
-
-(defn authors-list-query
-  [authors-list pub-id]
-  (loop [lst authors-list
-         i 1
-         authors-query []
-         writes-query []]
-    (if (empty? lst) (str "with "
-                                   (join ", " authors-query)
-                                   " insert into writes values "
-                                   (join ", " writes-query) ";")
-      (recur (rest lst)
-             (inc i)
-             (conj authors-query
-                 (str "author" i "_id as("
-                  (author-query (:keyname (first lst))
-                                (:forenames (first lst))) ")"))
-             (conj writes-query
-                  (str "((select id from author" i "_id), " pub-id ")"))))))
-
-
-
+  [pub-id keyname forenames]
+  (str
+    "with a1 (keyname, forenames) as ( "
+    "values('" (single-q->double (str keyname)) "','"
+               (single-q->double (str forenames)) "')), "
+    "try as ( "
+    "insert into authors (keyname,forenames) "
+      "select a1.keyname, a1.forenames "
+      "from a1 "
+      "where not exists ( "
+        "select * from authors a "
+        "where a.keyname = a1.keyname and "
+            " a.forenames = a1.forenames)"
+            " returning id) "
+    "insert into writes values ((select authors.id "
+                           " from authors "
+    "inner join a1 on authors.keyname = a1.keyname "
+             "and authors.forenames = a1.forenames "
+    "union all select try.id from try)," pub-id ");"))
 
 
 (defn record-query
@@ -56,7 +48,12 @@
                                                     :doi
                                                     :category
                                                     :comments]))
-      (sql/execute! conn [(authors-list-query (:authors-list parsed-map) pub-id)])))
+      (loop [authors-list (:authors-list parsed-map)]
+        (if (empty? authors-list) nil
+      (do
+      (sql/execute! conn [(author-query pub-id (:keyname (first authors-list))
+                                               (:forenames (first authors-list)))])
+      (recur (rest authors-list)))))))
 
 (defn record-thousand
   [recs]

@@ -188,5 +188,5 @@
   []
  (pprint
   #_(:authors-list (first rec))
-  #_(db/record-thousand (drop 10 rec))
-  (nth (map parse-record (get-records-list arxiv)) 15)))
+  (db/record-thousand rec)
+  #_(nth (map parse-record (get-records-list arxiv)) 3)))
