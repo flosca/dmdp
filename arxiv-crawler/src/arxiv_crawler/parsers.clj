@@ -186,7 +186,6 @@
 
 (defn -main
   []
- (pprint
   #_(:authors-list (first rec))
-  (db/record-thousand rec)
-  #_(nth (map parse-record (get-records-list arxiv)) 3)))
+  (db/record-thousand rec 1)
+  #_(nth (map parse-record (get-records-list arxiv)) 91))
