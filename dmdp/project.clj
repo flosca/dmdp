@@ -46,8 +46,8 @@
                                  [ring/ring-devel "1.4.0"]
                                  [pjstadig/humane-test-output "0.7.0"]
                                  [mvxcvi/puget "0.8.1"]]
-                  
-                  
+
+
                   :repl-options {:init-ns dmdp.core}
                   :injections [(require 'pjstadig.humane-test-output)
                                (pjstadig.humane-test-output/activate!)]

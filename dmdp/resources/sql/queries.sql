@@ -25,11 +25,15 @@ WHERE id = :id
 
 -- name: get-authors
 -- get a list of authors
-SELECT * FROM dmd.authors WHERE OFFSET :offset LIMIT :limit
+SELECT * FROM dmd.authors OFFSET :offset LIMIT :limit
 
 -- name: get-author
 -- get a specific author by id
 SELECT * FROM dmd.authors WHERE id = :id
+
+
+-- name: get-author-by-name
+SELECT * FROM dmd.authors WHERE keyname = :keyname and forenames = :forenames
 
 -- name: create-author!
 -- create an author
@@ -47,10 +51,24 @@ WHERE id = :id
 -- get a list of publications
 SELECT * FROM dmd.publications WHERE OFFSET :offset LIMIT :limit
 
+-- name: get-publication
+-- get a specific publication by id
+SELECT * FROM dmd.publications WHERE id = :id
+
+
+-- name: get-publications-by-title
+-- get a list of publications
+SELECT * FROM dmd.publications WHERE title like :title limit 10
+
 -- name: get-publications-by-author
 -- get a list of author's publications
 SELECT * FROM dmd.publications WHERE id in
-  (SELECT publication_id FROM author_of WHERE author_id = :author_id)
+  (SELECT publication_id FROM dmd.author_of WHERE author_id = :author_id)
+
+-- name: get-publications-by-author-name
+SELECT * FROM dmd.publications WHERE id in
+  (SELECT publication_id FROM dmd.author_of WHERE author_id in
+    (select id from dmd.authors where keyname = :keyname and forenames = :forenames))
 
 -- name: create-publication!
 -- create a publication
@@ -74,7 +92,7 @@ VALUES (:author_id, :publication_id)
 
 -- name: get-categories
 -- get a list of categories available
-SELECT * FROM dmd.categories WHERE OFFSET :offset LIMIT :limit
+SELECT * FROM dmd.categories OFFSET :offset LIMIT :limit
 
 -- name: get-category
 -- get a particular category by id

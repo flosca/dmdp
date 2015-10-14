@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-    {{author.id}}, {{author.keyname}}, {{author.forenames}}</br>
+{{author.keyname}}, {{author.forenames}} </br>
+
+ {% for publication in publications %}
+{{publication.id}}, {{publication.title}} </br>
+    {% endfor %}
 {% endblock %}

@@ -22,9 +22,12 @@
 ; Routes
 
 (defroutes private-routes
-  #_(GET "/" req (dmdp/home-page req))
-  (GET "/author/:id" req (dmdp/author-page req))
-  (GET "/authors" req (dmdp/authors-page req)))
+  (GET "/" req (dmdp/home-page req))
+  (GET "/search" req (dmdp/search-page req))
+  (GET "/author/:keyname :forenames" req (dmdp/author-page req))
+  (GET "/authors" req (dmdp/authors-page req))
+  (GET "/p/:id" req (dmdp/publication-page req))
+  #_(GET "/authors/:letter" req (dmdp/authors-page-by-letter req)))
 
 (defroutes public-routes
   (GET "/auth/login" [] (login-page))
