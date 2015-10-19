@@ -1,23 +1,28 @@
 -- name: create-user!
 -- creates a new user record
-INSERT INTO users
-(id, first_name, last_name, email, pass)
-VALUES (:id, :first_name, :last_name, :email, :pass)
+INSERT INTO dmd.users
+(first_name, last_name, email, pass)
+VALUES (:first_name, :last_name, :email, :password)
 
 -- name: update-user!
 -- update an existing user record
-UPDATE users
+UPDATE dmd.users
 SET first_name = :first_name, last_name = :last_name, email = :email
 WHERE id = :id
 
 -- name: get-user
 -- retrieve a user given the id.
-SELECT * FROM users
+SELECT * FROM dmd.users
 WHERE id = :id
+
+-- name: get-user-by-email
+-- retreive a user given an email
+SELECT * FROM dmd.users
+WHERE email = :email;
 
 -- name: delete-user!
 -- delete a user given the id
-DELETE FROM users
+DELETE FROM dmd.users
 WHERE id = :id
 
 
