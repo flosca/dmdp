@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="content">
+        Keyname: {{ author.keyname }} </br>
+        Connected forenames: {{ author.forenames }} </br>
+        Birthday: {{ author.date_of_birthday }} </br>
+        Affiliation: {{ author.affiliation }} </br>
+
+        Publications: </br>
+
+        {% for publication in author.publications %}
+            {{ publication.title }} </br>
+        {% endfor %}
+    <div>
+{% endblock %}

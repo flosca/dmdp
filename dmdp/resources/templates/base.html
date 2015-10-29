@@ -3,6 +3,7 @@
   <head>
     <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <META name="viewport" content="width=device-width, initial-scale=1">
+<<<<<<< HEAD
     <title>Welcome to dmdp</title>
     <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -17,19 +18,41 @@ MathJax.Hub.Config({
     <div>
       {% block content %}
       {% endblock %}
+=======
+    <title>{% block title %}{% endblock %}</title>
+  </head>
+  <body>
+    <div class="margin-10">
+        <nav class="container">
+            <div class="float-left">
+                <a href="/">Main page</a>
+            </div>
+            <div class="float-right">
+                {% if identity %}
+                    <a href="/auth/profile">Identity: {{identity}}</a>
+                {% else %}
+                    <a href="/auth/login">Login</a>
+                    <a href="/auth/register">Register</a>
+                {% endif %}
+            </div>
+        </nav>
     </div>
+
+    </br>
+
+    <div class="margin-10">
+        <div class="container">
+          {% block content %}
+          {% endblock %}
+        </div>
+>>>>>>> max
+    </div>
+
     <!-- scripts and styles -->
-    {% style "/assets/bootstrap/css/bootstrap.min.css" %}
-    {% style "/assets/bootstrap/css/bootstrap-theme.min.css" %}
-    {% style "/css/screen.css" %}
+    {% style "/css/main.css" %}
 
     {% script "/assets/jquery/jquery.min.js" %}
-    {% script "/assets/bootstrap/js/bootstrap.min.js" %}
-    {% script "/assets/bootstrap/js/collapse.js" %}
 
-    <script type="text/javascript">
-      var context = "{{servlet-context}}";
-    </script>
     {% block page-scripts %}
     {% endblock %}
   </body>

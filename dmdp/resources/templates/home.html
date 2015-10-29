@@ -6,5 +6,36 @@
 
 <div>
     <h2><a href="/search">Search page</a></h2>
+  <form action="" method="post"> {% csrf-field %}
+    <input type="text" name="query" id="query">
+  </form>
+
+  {% for author in authors %}
+    {{ author.keyname }}
+    {{ author.forenames }}
+    {{ author.date_of_birthday }}
+    {{ author.affiliation }}
+  {% endfor %}
+
+  {% for publication in publications %}
+    {{ publication.title }}
+    {{ publication.date_created }}
+    {{ publication.date_updated }}
+    {{ publication.journal_ref }}
+    {{ publication.abstract }}
+    {{ publication.doi }}
+    {{ publication.isbn }}
+    {{ publication.subcategories }]
+    {{ publication.comments }}
+
+    {% for category in publication.categories %}
+        {{ category.category_name }}
+    {% endfor %}
+
+    {% for author in publication.authors %}
+        {{ author.keyname }}
+    {% endfor %}
+  {% endfor %}
+
 
 {% endblock %}

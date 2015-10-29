@@ -15,6 +15,11 @@ WHERE id = :id
 SELECT * FROM dmd.users
 WHERE id = :id
 
+-- name: get-user-by-email
+-- retreive a user given an email
+SELECT * FROM dmd.users
+WHERE email = :email;
+
 
 -- name: delete-user!
 -- delete a user given the id
