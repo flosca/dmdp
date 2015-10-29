@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-{{author.keyname}}, {{author.forenames}} </br>
+<h1>{{author.keyname}}, {{author.forenames}}</h1> </br>
 
- {% for publication in publications %}
-{{publication.id}}, {{publication.title}} </br>
+ {% for p in publications %}
+<a href="/p/{{p.id}}">{{p.title}}</a> </br>
     {% endfor %}
 {% endblock %}

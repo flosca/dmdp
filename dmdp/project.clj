@@ -1,7 +1,6 @@
 (defproject dmdp "0.1.0-SNAPSHOT"
 
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+  :description "Neat management system for storing scientific publications."
 
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [selmer "0.9.2"]
@@ -58,5 +57,5 @@
    :project/test {:env {:test       true
                         :port       3001
                         :nrepl-port 7001}}
-   :profiles/dev {}
-   :profiles/test {}})
+   :profiles/dev {:env {}}
+   :profiles/test {:env {}}})

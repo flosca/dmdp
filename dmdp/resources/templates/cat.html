@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+ {% for p in publications %}
+<a href="/p/{{p.id}}"> {{p.title}}</a> {{p.date_updated}} </br>
+{% endfor %} </br>
+
+{% if offset >= 0 %}
+<a href="/cat/{{cat_name}}/{{prev_page}}"> Prev 10 </a>
+<a href="/cat/{{cat_name}}/{{next_page}}"> Next 10 </a>
+{% else %}
+no!
+{% endif %}
+
+
+{% endblock %}

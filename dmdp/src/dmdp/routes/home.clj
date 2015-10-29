@@ -13,7 +13,7 @@
   (layout/render "auth/login.html"))
 
 (defn login! [{:keys [params session]}]
-  (if (= (:username params) (:password params))
+  (if (= (:email params) (:password params))
     (-> (redirect "/")
         (assoc-in [:session :identity] {:name (:username params)}))
     (-> (redirect "/auth/login")
@@ -27,8 +27,11 @@
   (GET "/author/:keyname :forenames" req (dmdp/author-page req))
   (GET "/authors" req (dmdp/authors-page req))
   (GET "/p/:id" req (dmdp/publication-page req))
-  #_(GET "/authors/:letter" req (dmdp/authors-page-by-letter req)))
+  (GET "/cat/" [] (dmdp/list-of-cats-page))
+  (GET "/cat" [] (dmdp/list-of-cats-page))
+  (GET "/cat/:cat_name/:page" req (dmdp/cat-page req)))
 
 (defroutes public-routes
   (GET "/auth/login" [] (login-page))
-  (POST "/auth/login" req (login! req)))
+  (POST "/auth/login" req (login! req))
+)

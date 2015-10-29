@@ -1,23 +1,24 @@
 -- name: create-user!
 -- creates a new user record
-INSERT INTO users
-(id, first_name, last_name, email, pass)
-VALUES (:id, :first_name, :last_name, :email, :pass)
+INSERT INTO dmd.users
+(first_name, last_name, email, admin, pass)
+VALUES (:first_name, :last_name, :email, false, :pass)
 
 -- name: update-user!
 -- update an existing user record
-UPDATE users
+UPDATE dmd.users
 SET first_name = :first_name, last_name = :last_name, email = :email
 WHERE id = :id
 
 -- name: get-user
 -- retrieve a user given the id.
-SELECT * FROM users
+SELECT * FROM dmd.users
 WHERE id = :id
+
 
 -- name: delete-user!
 -- delete a user given the id
-DELETE FROM users
+DELETE FROM dmd.users
 WHERE id = :id
 
 
@@ -33,7 +34,10 @@ SELECT * FROM dmd.authors WHERE id = :id
 
 
 -- name: get-author-by-name
-SELECT * FROM dmd.authors WHERE keyname = :keyname and forenames = :forenames
+SELECT distinct * FROM dmd.authors WHERE keyname = :keyname and forenames = :forenames
+
+-- name: search-author-by-name
+SELECT distinct * FROM dmd.authors WHERE keyname like :keyname or forenames like :forenames limit 10
 
 -- name: create-author!
 -- create an author
@@ -55,6 +59,19 @@ SELECT * FROM dmd.publications WHERE OFFSET :offset LIMIT :limit
 -- get a specific publication by id
 SELECT * FROM dmd.publications WHERE id = :id
 
+-- name: get-authors-of-publication
+select * from dmd.authors where id in
+  (SELECT author_id FROM dmd.author_of WHERE publication_id = :pub_id)
+
+-- name: get-publications-from-category
+select * from dmd.publications where id in
+  (SELECT publication_id FROM dmd.category_of WHERE category_id =
+   (select id from dmd.categories where category_name = :cat_name)) limit 10 offset :offset
+
+-- name: count-publications
+select count(*) from dmd.publications where id in
+  (SELECT publication_id FROM dmd.category_of WHERE category_id =
+   (select id from dmd.categories where category_name = :cat_name))
 
 -- name: get-publications-by-title
 -- get a list of publications
@@ -92,11 +109,11 @@ VALUES (:author_id, :publication_id)
 
 -- name: get-categories
 -- get a list of categories available
-SELECT * FROM dmd.categories OFFSET :offset LIMIT :limit
+SELECT * FROM dmd.categories
 
--- name: get-category
--- get a particular category by id
-SELECT * FROM dmd.categories WHERE id = :id
+-- name: get-category-id
+-- get a particular category by name
+select id from dmd.categories where category_name = :cat_name
 
 -- name: create-category!
 -- create a new category
