@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="content">
+        {{ publication.title }}
+        {{ publication.date_created }}
+        {{ publication.date_updated }}
+        {{ publication.journal_ref }}
+        {{ publication.abstract }}
+        {{ publication.doi }}
+        {{ publication.isbn }}
+        {{ publication.subcategories }]
+        {{ publication.comments }}
+
+        {% for category in publication.categories %}
+            {{ category.category_name }}
+        {% endfor %}
+
+        {% for author in publication.authors %}
+            {{ author.keyname }}
+        {% endfor %}
+    </div>
+{% endblock %}

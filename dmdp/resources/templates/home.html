@@ -1,15 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
-  Identity: {{identity}}</br>
-  <div class="jumbotron">
-    <h1>Welcome to dmdp</h1>
-    <p>Time to start building your site!</p>
-    <p><a class="btn btn-primary btn-lg" href="http://luminusweb.net">Learn more &raquo;</a></p>
-  </div>
 
-  <div class="row">
-    <div class="span12">
-    {{docs|markdown}}
-    </div>
-  </div>
+  <form action="" method="post"> {% csrf-field %}
+    <input type="text" name="query" id="query">
+  </form>
+
+  {% for author in authors %}
+    {{ author.keyname }}
+    {{ author.forenames }}
+    {{ author.date_of_birthday }}
+    {{ author.affiliation }}
+  {% endfor %}
+
+  {% for publication in publications %}
+    {{ publication.title }}
+    {{ publication.date_created }}
+    {{ publication.date_updated }}
+    {{ publication.journal_ref }}
+    {{ publication.abstract }}
+    {{ publication.doi }}
+    {{ publication.isbn }}
+    {{ publication.subcategories }]
+    {{ publication.comments }}
+
+    {% for category in publication.categories %}
+        {{ category.category_name }}
+    {% endfor %}
+
+    {% for author in publication.authors %}
+        {{ author.keyname }}
+    {% endfor %}
+  {% endfor %}
+
 {% endblock %}

@@ -16,13 +16,14 @@
   (GET "/auth/profile/:id" req (auth/profile-page req))
   (GET "/auth/register" req (auth/register-profile-page req))
   (POST "/auth/register" req (auth/register-profile! req))
-  (GET "/auth/profile/edit/:id" req (auth/edit-profile-page req))
-  (POST "/auth/profile/edit/:id" req (auth/edit-profile! req))
 
-  (GET "/search" req (dmdp/search-page req))
-  (GET "/author/:keyname :forenames" req (dmdp/author-page req))
-  (GET "/authors" req (dmdp/authors-page req))
-  (GET "/p/:id" req (dmdp/publication-page req))
+  (GET "/profile/edit/:id" req (auth/edit-profile-page req))
+  (POST "/profile/edit/:id" req (auth/edit-profile! req))
+
+  (GET "/content/search" req (dmdp/search-page req))
+  (GET "/content/authors/:id" req (dmdp/author-page req))
+  (GET "/content/authors" req (dmdp/authors-page req))
+  (GET "/content/:id" req (dmdp/publication-page req))
   #_(GET "/authors/:letter" req (dmdp/authors-page-by-letter req)))
 
 (defroutes public-routes
