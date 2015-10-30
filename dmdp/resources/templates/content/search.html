@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-    <form>
-        <p><input type="search" name="q" placeholder="Search" value="{{query}}">
-        <input type="submit" value="Find"></p>
-    </form>
+    <h2><a href="/search">Search page</a></h2>
 
+    <form> {% csrf-field %}
+        <input type="text" name="q" id="query" placeholder="Enter your query here..">
+    </form>
+    </br>
     <b>Publications containing "{{query}}" in title:</b> </br>
 
     {% for publication in publications %}
