@@ -6,22 +6,16 @@
 
 (defn home-page [{:keys [session]}]
   (layout/render
-    "home.html" {:docs (-> "docs/docs.md" io/resource slurp)
-                 :identity (str (:identity session "None"))}))
+    "home.html" {:identity (str (:identity session "None"))}))
 
 (defn search-page [{:keys [params]}]
   (if (empty? params)
     (layout/render
-    "search.html")
-  (layout/render
-    "search.html" {:publications
-                   (db/get-publications-by-title
-                    {:title (str "%" (:q params) "%")})
-                   :authors
-                    (db/search-author-by-name
-                     {:keyname (str "%" (:q params) "%")
-                      :forenames (str "%" (:q params) "%")})
-                   :query (:q params)})))
+     "content/search.html")
+    (layout/render
+     "content/search.html" {:publications (db/get-publications-by-title {:title (str "%" (:q params) "%")})
+                           :authors (db/search-author-by-name {:keyname (str "%" (:q params) "%") :forenames (str "%" (:q params) "%")})
+                           :query (:q params)})))
 
 (defn list-of-cats-page []
   (layout/render

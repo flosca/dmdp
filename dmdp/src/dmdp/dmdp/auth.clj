@@ -16,21 +16,9 @@
     (-> (redirect "/auth/login")
         (assoc-in [:session :identity] nil))))
 
-(defn profile-page [{:keys [params]}]
-  (layout/render
-   "auth/profile.html" {:user (first (db/get-user {:id (Integer/parseInt (:id params))}))}))
-
-(defn edit-profile-page [{:keys [params]}]
-  (layout/render
-   "auth/edit_profile.html" {:user (first (db/get-user {:id (:id params)}))}))
-
-(defn edit-profile! [{:keys [params]}]
-  (layout/render
-   "auth/edit_profile.html" {:user (db/update-user! {:id (:id params)})}))
-
 (defn register-profile-page [{:keys [params]}]
   (layout/render
-   "auth/edit_profile.html" {}))
+   "auth/register.html" {}))
 
 (defn register-profile! [{:keys [params]}]
   (if (validators/validate-registration params)

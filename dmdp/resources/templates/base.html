@@ -3,23 +3,15 @@
   <head>
     <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <META name="viewport" content="width=device-width, initial-scale=1">
-<<<<<<< HEAD
-    <title>Welcome to dmdp</title>
-    <script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
-});
-</script>
-<script type="text/javascript"
-        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-</head>
-  <body>
-    <div>
-      {% block content %}
-      {% endblock %}
-=======
     <title>{% block title %}{% endblock %}</title>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+        });
+    </script>
+    <script type="text/javascript"
+            src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
   </head>
   <body>
     <div class="margin-10">
@@ -29,7 +21,7 @@ MathJax.Hub.Config({
             </div>
             <div class="float-right">
                 {% if identity %}
-                    <a href="/auth/profile">Identity: {{identity}}</a>
+                    <a href="/profile">Identity: {{identity}}</a>
                 {% else %}
                     <a href="/auth/login">Login</a>
                     <a href="/auth/register">Register</a>
@@ -45,7 +37,6 @@ MathJax.Hub.Config({
           {% block content %}
           {% endblock %}
         </div>
->>>>>>> max
     </div>
 
     <!-- scripts and styles -->

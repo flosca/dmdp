@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{author.keyname}}, {{author.forenames}}</h1> </br>
+    First name: {{ user.first_name }} <br/>
+    Last name: {{ user.last_name }} <br/>
+    Email: {{ user.email }} <br/>
 
- {% for p in publications %}
-<a href="/p/{{p.id}}">{{p.title}}</a> </br>
+    <h1>{{author.keyname}}, {{author.forenames}}</h1> </br>
+
+    {% for publication in publications %}
+        <a href="/content/publications/{{publication.id}}">{{publication.title}}</a> </br>
     {% endfor %}
 {% endblock %}

@@ -1,10 +1,21 @@
 {% extends "base.html" %}
 
+{% block title %}
+Login
+{% endblock %}
+
 {% block content %}
-<form action="" method="POST">
-    {% csrf-field %}
-    Email: <input type="email" name="email" id="email"></br>
-    Password: <input type="password" name="password" id="password"></br>
-    <input type="submit">
+<form action="" method="POST" class="input-form"> {% csrf-field %}
+    <table>
+      <tr>
+        <td><input type="email" name="email" id="email" placeholder="Email"></td>
+      </tr>
+      <tr>
+        <td><input type="password" name="password" id="password" placeholder="Password"></td>
+      </tr>
+      <tr>
+        <td><input type="submit" value="Login"></td>
+      </tr>
+    </table>
 </form>
 {% endblock %}

@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
-   <form>
-       <p><input type="search" name="q" placeholder="Search" value="{{query}}">
-       <input type="submit" value="Find"></p>
-  </form>
+    <form>
+        <p><input type="search" name="q" placeholder="Search" value="{{query}}">
+        <input type="submit" value="Find"></p>
+    </form>
 
-<b>Publications containing "{{query}}" in title:</b> </br>
+    <b>Publications containing "{{query}}" in title:</b> </br>
 
-{% for publication in publications %}
-    <a href="/content/publications/{{p.id}}"> {{ publication.title }} </a> </br>
-{% endfor %} </br>
+    {% for publication in publications %}
+        <a href="/content/publications/{{ publication.id }}"> {{ publication.title }} </a> </br>
+    {% endfor %} </br>
 
 {% endblock %}

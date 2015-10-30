@@ -33,3 +33,10 @@
          :password validators/required)
        (is-user-unique? params)))
 
+(defn validate-edition [params]
+  (bouncer/valid?
+   params
+   :first_name validators/required
+   :last_name validators/required
+   :email validators/required))
+

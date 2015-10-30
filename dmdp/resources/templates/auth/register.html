@@ -1,21 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form action="{{servlet-context}}/auth/register" method="POST">
-<label for="first_name">
-<input id="first_name" name="first_name" placeholder="First Name"  type="text" value={{first_name}}></input>
-</label>
-<label for="last_name">
-<input id="last_name" name="last_name" placeholder="Last Name"  type="text" value={{last_name}}></input>
-</label>
-<label for="email">
-<input id="email" name="email" placeholder="Email"  type="text" value={{email}}></input>
-</label>
-<label for="pass">
-<input id="pass" name="pass" placeholder="Password"  type="password" value={{pass}}></input>
-</label>
-<button type="submit" >Register</button>
-</form>
-</br>
-{{servlet-context}}
+    <form action="/auth/register" method="POST" class="input-form"> {% csrf-field %}
+        <table>
+            <tr>
+                <td><input id="first_name" name="first_name" placeholder="First name" type="text" value={{first_name}}></input></td>
+            </tr>
+            <tr>
+                <td><input id="last_name" name="last_name" placeholder="Last name" type="text" value={{last_name}}></input></td>
+            </tr>
+            <tr>
+                <td><input id="email" name="email" placeholder="Email" type="text" value={{email}}></input></td>
+            </tr>
+            <tr>
+                <td><input id="pass" name="pass" placeholder="Password" type="password" value={{pass}}></input></td>
+            </tr>
+            <tr>
+                <td><input type="submit" value="Register"></td>
+        </table>
+    </form>
 {% endblock %}

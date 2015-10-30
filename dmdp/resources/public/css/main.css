@@ -29,16 +29,30 @@ a:visited {
   width: 90%;
 }
 
-input[type="text"] {
-  border-radius: 5px;
-  border-style: solid;
-  border-color: #3366FF;
-  outline: none;
-  box-shadow: none;
-}
-
 .content {
   border-style: solid;
   border-color: #3366FF;
   border-radius: 5px;
+}
+
+.input-form {
+  width: 301px;
+  margin: 60px auto;
+}
+
+.input-form input[type="submit"] {
+  width: 100%;
+}
+
+input {
+  border-radius: 5px;
+  border-style: solid;
+  border-color: #8EB3FF;
+  outline: none;
+  box-shadow: none;
+  padding: 2px;
+}
+
+input[type="submit"] {
+  border-color: #BBB;
 }
