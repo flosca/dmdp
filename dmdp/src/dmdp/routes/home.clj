@@ -6,7 +6,7 @@
             [ring.util.response :refer [response redirect]]
             [clojure.java.io :as io]
             [dmdp.db.core :as db]
-            [dmdp.dmdp.core :as dmdp]
+            [dmdp.dmdp.content :as content]
             [dmdp.dmdp.validators :as validators]
             [dmdp.dmdp.auth :as auth]
             [dmdp.dmdp.profile :as profile]))
@@ -14,7 +14,7 @@
 ; Routes
 
 (defroutes private-routes
-  (GET "/" req (dmdp/home-page req))
+  (GET "/" req (content/home-page req))
   (GET "/auth/register" req (auth/register-profile-page req))
   (POST "/auth/register" req (auth/register-profile! req))
 
@@ -22,11 +22,12 @@
   (POST "/profile/edit" req (profile/edit-profile! req))
   (GET "/profile" req (profile/profile-page req))
 
-  (GET "/content/search" req (dmdp/search-page req))
-  (GET "/content/authors/:id" req (dmdp/author-page req))
-  (GET "/content/authors" req (dmdp/authors-page req))
-  (GET "/content/:id" req (dmdp/publication-page req))
-  #_(GET "/authors/:letter" req (dmdp/authors-page-by-letter req)))
+  (GET "/content/search" req (content/search-page req))
+  (GET "/content/authors" req (content/authors-page req))
+  (GET "/content/authors/:id" req (content/author-page req))
+  (GET "/content/publications" req (content/publications-page req))
+  (GET "/content/publications/:id" req (content/publication-page req))
+  #_(GET "/authors/:letter" req (content/authors-page-by-letter req)))
 
 (defroutes public-routes
   (GET "/auth/login" [] (auth/login-page))

@@ -58,7 +58,7 @@ WHERE id = :id
 
 -- name: get-publications
 -- get a list of publications
-SELECT * FROM dmd.publications WHERE OFFSET :offset LIMIT :limit
+SELECT * FROM dmd.publications OFFSET :offset LIMIT :limit
 
 -- name: get-publication
 -- get a specific publication by id

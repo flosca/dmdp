@@ -1,4 +1,4 @@
-(ns dmdp.dmdp.core
+(ns dmdp.dmdp.content
   (:require [dmdp.layout :as layout]
             [dmdp.db.core :as db]
             [clojure.java.io :as io]
@@ -50,29 +50,23 @@
 
 (defn authors-page [{:keys [params]}]
   (layout/render
-   "authors.html" {:authors
+   "content/authors/authors.html" {:authors
                    (db/get-authors
-                    {:limit 20 #_(:limit params)
-                     :offset 20 #_(:offset params)})}))
+                    {:limit (Integer/parseInt (:limit params "20"))
+                     :offset (Integer/parseInt (:offset params "20"))})}))
+
+(defn publications-page [{:keys [params]}]
+  (layout/render
+   "content/publications/publications.html" {:publications (db/get-publications {:offset (Integer/valueOf (:offset params "20"))
+                                                                                 :limit (Integer/valueOf (:limit params "20"))})}))
 
 (defn publication-page [{:keys [params]}]
   (layout/render
-   "p.html" {:p
-             (first
-              (db/get-publication {:id (Integer/valueOf (:id params))}))
-             :authors
-             (db/get-authors-of-publication
-              {:pub_id  (Integer/valueOf (:id params))})}))
+   "content/publications/publication.html" {:publication (first (db/get-publication {:id (Integer/valueOf (:id params))}))
+                                            :authors (db/get-authors-of-publication {:pub_id (Integer/valueOf (:id params))})}))
 
 (defn author-page [{:keys [params]}]
   (layout/render
-   "author.html" {:author
-                   (first (db/get-author-by-name
-                          {:keyname (:keyname params)
-                           :forenames (:forenames params)}
-                   #_{:id (Integer/valueOf (:id params))})),
-                  :publications
-                  (db/get-publications-by-author-name
-                   {:keyname (:keyname params)
-                    :forenames (:forenames params)}
-                   #_{:author_id (Integer/valueOf (:id params))})}))
+   "content/authors/author.html"
+     {:author (first (db/get-author {:id (Integer/valueOf (:id params))}))
+      :publications (db/get-publications-by-author {:author_id (Integer/valueOf (:id params))})}))

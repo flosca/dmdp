@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}
+Pubications
+{% endblock %}
+
+
+{% block content %}
+    {% for publication in publications %}
+        <div class="content">
+            <a href="/content/publications/{{ publication.id }}">{{ publication.title }}</a> </br>
+            Created: {{ publication.date_created }} </br>
+            Updated: {{ publication.date_updated }} </br>
+            Journal ref.: {{ publication.journal_ref }}
+        </div>
+    {% endfor %}
+{% endblock %}

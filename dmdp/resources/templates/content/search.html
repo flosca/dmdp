@@ -2,14 +2,20 @@
 {% block content %}
     <h2><a href="/search">Search page</a></h2>
 
-    <form> {% csrf-field %}
-        <input type="text" name="q" id="query" placeholder="Enter your query here..">
+    <form>
+        <input type="text" name="q" id="query" placeholder="Enter your query here.." value="{{query}}">
     </form>
     </br>
-    <b>Publications containing "{{query}}" in title:</b> </br>
+    {% if publications %}
+        <b>Publications containing "{{query}}" in title:</b> </br>
 
-    {% for publication in publications %}
-        <a href="/content/publications/{{ publication.id }}"> {{ publication.title }} </a> </br>
-    {% endfor %} </br>
+        {% if publications|length > 0 %}
+            {% for publication in publications %}
+                <a href="/content/publications/{{ publication.id }}"> {{ publication.title }} </a> </br>
+            {% endfor %} </br>
+        {% else %}
+            No results for your query.
+        {% endif %}
+    {% endif %}
 
 {% endblock %}

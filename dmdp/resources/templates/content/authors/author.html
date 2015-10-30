@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block title %}
+Author: {{ author.keyname }}
+{% endblock %}
+
 {% block content %}
     <div class="content">
         Keyname: {{ author.keyname }} </br>
@@ -7,10 +11,12 @@
         Birthday: {{ author.date_of_birthday }} </br>
         Affiliation: {{ author.affiliation }} </br>
 
-        Publications: </br>
+        </br>
 
-        {% for publication in author.publications %}
-            {{ publication.title }} </br>
+        Publications: </br></br>
+
+        {% for publication in publications %}
+            <a href="/content/publications/{{ publication.id }}">{{ publication.title }}</a> </br>
         {% endfor %}
     <div>
 {% endblock %}

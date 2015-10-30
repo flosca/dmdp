@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="" method="POST" class="input-form"> {% csrf-field %}
+    <table>
+        <tr>
+            <td>First name: </td>
+            <td><input type="text" name="first_name" id="first_name" value="{{ user.first_name }}"></td>
+        </td>
+        <tr>
+            <td>Last name: </td>
+            <td><input type="text" name="last_name" id="last_name" value="{{ user.last_name }}"></td>
+        </td>
+        <tr>
+            <td>Email: </td>
+            <td><input type="email" name="email" id="email" value="{{ user.email }}"></td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="submit" value="Save"></td>
+        </tr>
+    </table>
+</form>
+{% endblock %}
