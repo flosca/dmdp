@@ -1,8 +1,8 @@
 -- name: create-user!
 -- creates a new user record
 INSERT INTO dmd.users
-(first_name, last_name, email, admin, pass)
-VALUES (:first_name, :last_name, :email, false, :pass)
+(first_name, last_name, email, admin, pass, salt)
+VALUES (:first_name, :last_name, :email, false, :encrypted_pass, :salt)
 
 -- name: update-user!
 -- update an existing user record
