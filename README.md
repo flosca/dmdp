@@ -1,14 +1,14 @@
-# wrapper
+# DMDP
 
-A Clojure library designed to ... well, that part is up to you.
+Content management system for storing scientific publications.
 
 ## Usage
 
-FIXME
+	lein run
 
 ## License
 
-Copyright © 2015 FIXME
+Copyright © Vladislav Skukov, Maxim Skoryakov
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
