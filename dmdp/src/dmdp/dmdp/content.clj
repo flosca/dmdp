@@ -6,67 +6,65 @@
 
 (defn home-page [{:keys [session]}]
   (layout/render
-    "home.html" {:identity (str (:identity session "None"))}))
+    "home.html" {:identity (:identity session)}))
 
-(defn search-page [{:keys [params]}]
+(defn search-page [{:keys [params session]}]
   (if (empty? params)
     (layout/render
-     "content/search.html")
-    (layout/render
-     "content/search.html" {:publications (db/get-publications-by-title {:title (str "%" (:q params) "%")})
-                           :authors (db/search-author-by-name {:keyname (str "%" (:q params) "%") :forenames (str "%" (:q params) "%")})
-                           :query (:q params)})))
+     "content/search.html" {:identity (:identity session)})
+      (let [limit (Integer/parseInt(:limit params "20"))
+            offset (Integer/parseInt(:offset params "0"))
+            title (let [query (:q params)] (if (= query nil) nil (str "%" query "%")))
+            category_id (let [category (:category params)] (if (= category nil) nil (Integer/parseInt category)))]
+      (layout/render
+       "content/search.html" {:publications
+                              (cond
+                               (and (not= category_id nil) (not= title nil)) (do (println "1\n") (db/get-publications-by-title-from-category
+                                                                                                  {:category_id category_id
+                                                                                                   :title title
+                                                                                                   :limit limit
+                                                                                                   :offset offset})) ; by title and category
+                               (not= category_id nil) (db/get-publications-from-category-by-category-id
+                                                       {:category_id category_id
+                                                        :limit limit
+                                                        :offset offset})
+                               (not= title nil) (db/get-publications-by-title {:title title})
+                               :else (do (println "No filter!\n") []))
+                             :authors (db/search-author-by-name {:keyname (str "%" (:q params) "%") :forenames (str "%" (:q params) "%")})
+                             :query (:q params)
+                             :category_name (if (= category_id nil) nil (:category_name (first (db/get-category-name-by-id {:id category_id}))))
+                             :identity (:identity session)}))))
 
-(defn list-of-cats-page []
+(defn categories-page [{:keys [params session]}]
   (layout/render
-   "list-of-cats.html" {:categories
-               (db/get-categories)}))
+   "content/categories/categories.html" {:categories (db/get-categories)
+                                         :identity (:identity session)}))
 
-(defn- count-publications-in-category [{:keys [params]}]
-  (db/count-publications
-    {:cat_name (:cat_name params)}))
-
-(defn cat-page [{:keys [params]}]
-  (let [cat-name (:cat_name params)
-        page (Integer/valueOf (:page params))
-        offset (* (dec page) 10)]
-  ;(if (zero? (mod offset 10))
-  (layout/render
-   "cat.html" {:publications
-               (db/get-publications-from-category
-                {:cat_name cat-name
-                 :offset offset})
-
-               :offset offset
-
-               :cat_name cat-name
-
-               :next_page (inc page)
-
-               :prev_page (dec page)})))
-
- ; (layout/render "error.html"))))
-
-
-(defn authors-page [{:keys [params]}]
+(defn authors-page [{:keys [params session]}]
   (layout/render
    "content/authors/authors.html" {:authors
                    (db/get-authors
                     {:limit (Integer/parseInt (:limit params "20"))
-                     :offset (Integer/parseInt (:offset params "20"))})}))
+                     :offset (Integer/parseInt (:offset params "20"))
+                     :identity (:identity session)})}))
 
-(defn publications-page [{:keys [params]}]
+(defn publications-page [{:keys [params session]}]
   (layout/render
    "content/publications/publications.html" {:publications (db/get-publications {:offset (Integer/valueOf (:offset params "20"))
-                                                                                 :limit (Integer/valueOf (:limit params "20"))})}))
+                                                                                 :limit (Integer/valueOf (:limit params "20"))
+                                                                                 :identity (:identity session)})}))
 
-(defn publication-page [{:keys [params]}]
-  (layout/render
-   "content/publications/publication.html" {:publication (first (db/get-publication {:id (Integer/valueOf (:id params))}))
-                                            :authors (db/get-authors-of-publication {:pub_id (Integer/valueOf (:id params))})}))
+(defn publication-page [{:keys [params session]}]
+  (let [id (Integer/parseInt (:id params))]
+    (layout/render
+     "content/publications/publication.html" {:publication (first (db/get-publication {:id id}))
+                                              :authors (db/get-authors-of-publication {:pub_id id})
+                                              :categories (db/get-publication-categories {:publication_id id})
+                                              :identity (:identity session)})))
 
-(defn author-page [{:keys [params]}]
+(defn author-page [{:keys [params session]}]
   (layout/render
    "content/authors/author.html"
      {:author (first (db/get-author {:id (Integer/valueOf (:id params))}))
-      :publications (db/get-publications-by-author {:author_id (Integer/valueOf (:id params))})}))
+      :publications (db/get-publications-by-author {:author_id (Integer/valueOf (:id params))})
+      :identity (:identity session)}))

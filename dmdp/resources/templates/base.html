@@ -18,10 +18,14 @@
         <nav class="container">
             <div class="float-left">
                 <a href="/">Main page</a>
+                {% if identity %}
+                    <a href="/content/search">Search</a>
+                {% endif %}
             </div>
             <div class="float-right">
                 {% if identity %}
-                    <a href="/profile">Identity: {{identity}}</a>
+                    <a href="/profile">Identity: {{ identity.name }}</a>
+                    <a href="/auth/logout">Logout</a>
                 {% else %}
                     <a href="/auth/login">Login</a>
                     <a href="/auth/register">Register</a>

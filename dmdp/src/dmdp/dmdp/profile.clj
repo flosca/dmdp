@@ -9,6 +9,7 @@
     (if (not= id nil)
       (layout/render
          "profile/profile.html" {:user (first (db/get-user {:id id}))
+                                 :identity (:identity session)
          ;:publications (db/get-publications-by-author {:author_id (Integer/parseInt (:id params))})}))
                            })
       (redirect "/auth/login"))))
@@ -17,7 +18,8 @@
   (let [id (:id (:identity session nil) nil)]
     (if (not= id nil)
       (layout/render
-         "profile/edit_profile.html" {:user (first (db/get-user {:id (:id (:identity session))}))})
+         "profile/edit_profile.html" {:user (first (db/get-user {:id (:id (:identity session))}))
+                                      :identity (:identity session)})
       (redirect "/auth/login"))))
 
 (defn edit-profile! [{:keys [params session]}]

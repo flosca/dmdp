@@ -68,10 +68,10 @@ SELECT * FROM dmd.publications WHERE id = :id
 select * from dmd.authors where id in
   (SELECT author_id FROM dmd.author_of WHERE publication_id = :pub_id)
 
--- name: get-publications-from-category
+-- name: get-publications-from-category-by-category-id
 select * from dmd.publications where id in
   (SELECT publication_id FROM dmd.category_of WHERE category_id =
-   (select id from dmd.categories where category_name = :cat_name)) limit 10 offset :offset
+   (select id from dmd.categories where id = :category_id)) limit :limit offset :offset
 
 -- name: count-publications
 select count(*) from dmd.publications where id in
@@ -81,6 +81,12 @@ select count(*) from dmd.publications where id in
 -- name: get-publications-by-title
 -- get a list of publications
 SELECT * FROM dmd.publications WHERE title like :title limit 10
+
+-- name: get-publications-by-title-from-category
+-- get a list of publications
+SELECT * FROM dmd.publications WHERE title like :title and id in
+  (SELECT publication_id FROM dmd.category_of WHERE category_id =
+   (select id from dmd.categories where id = :category_id)) limit :limit offset :offset
 
 -- name: get-publications-by-author
 -- get a list of author's publications
@@ -116,9 +122,16 @@ VALUES (:author_id, :publication_id)
 -- get a list of categories available
 SELECT * FROM dmd.categories
 
+-- name: get-category-name-by-id
+select category_name from dmd.categories where id = :id
+
 -- name: get-category-id
 -- get a particular category by name
 select id from dmd.categories where category_name = :cat_name
+
+-- name: get-publication-categories
+select * from dmd.categories where id in
+  (select category_id from dmd.category_of where publication_id = :publication_id)
 
 -- name: create-category!
 -- create a new category

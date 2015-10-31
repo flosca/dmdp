@@ -27,8 +27,11 @@
   (GET "/content/authors/:id" req (content/author-page req))
   (GET "/content/publications" req (content/publications-page req))
   (GET "/content/publications/:id" req (content/publication-page req))
+  (GET "/content/categories" req (content/categories-page req))
+
   #_(GET "/authors/:letter" req (content/authors-page-by-letter req)))
 
 (defroutes public-routes
-  (GET "/auth/login" [] (auth/login-page))
-  (POST "/auth/login" req (auth/login! req)))
+  (GET "/auth/login" req (auth/login-page req))
+  (POST "/auth/login" req (auth/login! req))
+  (GET "/auth/logout" req (auth/logout-page req)))

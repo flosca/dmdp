@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block title %}
+Registration
+{% endblock %}
+
 {% block content %}
     <form action="/auth/register" method="POST" class="input-form"> {% csrf-field %}
         <table>
