@@ -1,3 +1,7 @@
+* {
+  font-family: Geneva, Arial, Helvetica, sans-serif;
+}
+
 .container {
   margin: 0 auto;
   width: 900px;
@@ -57,4 +61,33 @@ input {
 
 input[type="submit"] {
   border-color: #BBB;
+}
+
+.border-radius-7 {
+  border-radius: 7px;
+}
+
+h1 {
+  text-align: center;
+  color: #0786DB;
+}
+
+.btn-big {
+  width: 220px;
+  height: 90px;
+  font-size: 34px;
+  display: inline-block;
+
+  color: #FF244C;
+  background-color: #fff;
+  border-style: solid;
+  border-color: #8EB3FF;
+  border-radius: 5px;
+  margin: 10px 3px;
+  cursor: pointer;
+}
+
+.centered-block {
+  width: 700px;
+  margin: 0 auto;
 }

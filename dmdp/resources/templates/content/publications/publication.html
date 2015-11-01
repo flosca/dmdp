@@ -16,8 +16,8 @@ Pubication: {{ publication.title }}
 
         Categories: </br>
 
-        {% for category in publication.categories %}
-            <a href="/content/categories/{{ category.id }}">{{ category.category_name }}</a> </br>
+        {% for category in categories %}
+            <a href="/content/search?category={{ category.id }}">{{ category.category_name }}</a> </br>
         {% endfor %}
 
         Authors: </br>

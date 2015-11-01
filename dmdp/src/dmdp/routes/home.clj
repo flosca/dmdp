@@ -27,14 +27,16 @@
   (GET "/content/authors/:id" req (content/author-page req))
   (GET "/content/publications" req (content/publications-page req))
   (GET "/content/publications/:id" req (content/publication-page req))
-
   (GET "/content/publications/:id/edit" req (content/edit-publication-page req))
   (POST "/content/publications/:id/edit" req (content/edit-publication! req))
 
   (GET  "/content/new-publication" req (content/new-publication-page req))
-  (POST "/content/new-publication" req (content/add-new-publication! req)))
+  (POST "/content/new-publication" req (content/add-new-publication! req))
+  (GET "/content/categories" req (content/categories-page req)))
 
 (defroutes public-routes
   (GET "/auth/login" [] (auth/login-page))
   (POST "/auth/login" req (auth/login! req))
-  (GET "/auth/not-admin" [] (auth/not-admin-page)))
+  (GET "/auth/not-admin" [] (auth/not-admin-page))
+  (GET "/auth/logout" req (auth/logout-page req)))
+

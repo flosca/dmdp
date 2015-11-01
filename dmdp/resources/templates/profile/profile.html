@@ -5,15 +5,14 @@ Profile: {{ user.first_name }} {{ user.last_name }}
 {% endblock %}
 
 {% block content %}
-    First name: {{ user.first_name }} <br/>
-    Last name: {{ user.last_name }} <br/>
-    Email: {{ user.email }} <br/>
-
-    {% if author|empty? %} {% else %} <h1>{{author.keyname}}, {{author.forenames}}</h1> </br> {% endif %}
-
-    {% for publication in publications %}
-        <a href="/content/publications/{{publication.id}}">{{publication.title}}</a> </br>
-    {% endfor %}
+    <div class="input-form">
+        First name: {{ user.first_name }} <br/>
+        Last name: {{ user.last_name }} <br/>
+        Email: {{ user.email }} <br/>
+        <hr/>
+        <a href="/profile/edit" class="float-right">Edit profile</a>
+    </div>
 
 {% if user.admin %} <h3><a href="/content/new-publication"> Add new publication </a></h3> {% else %} {% endif %}
+
 {% endblock %}
