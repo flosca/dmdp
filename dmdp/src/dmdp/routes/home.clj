@@ -36,4 +36,5 @@
 
 (defroutes public-routes
   (GET "/auth/login" [] (auth/login-page))
-  (POST "/auth/login" req (auth/login! req)))
+  (POST "/auth/login" req (auth/login! req))
+  (GET "/auth/not-admin" [] (auth/not-admin-page)))

@@ -9,6 +9,9 @@
 (defn login-page []
   (layout/render "auth/login.html"))
 
+(defn not-admin-page []
+  (layout/render "auth/not-admin.html"))
+
 (defn login! [{:keys [params session]}]
   (if (validators/validate-login params)
     (-> (redirect "/")

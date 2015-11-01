@@ -50,7 +50,8 @@
                                    :authors
                    (db/get-authors
                     {:limit (Integer/parseInt (:limit params "20"))
-                     :offset (Integer/parseInt (:offset params "20"))})}))))
+                     :offset (Integer/parseInt (:offset params "20"))})})
+      (redirect "/auth/login"))))
 
 (defn publications-page [{:keys [params session]}]
   (let [id (:id (:identity session nil) nil)]
@@ -58,7 +59,8 @@
   (layout/render
    "content/publications/publications.html" {:user (first (db/get-user {:id (:id (:identity session))}))
                                              :publications (db/get-publications {:offset (Integer/valueOf (:offset params "20"))
-                                                                                 :limit (Integer/valueOf (:limit params "20"))})}))))
+                                                                                 :limit (Integer/valueOf (:limit params "20"))})})
+      (redirect "/auth/login"))))
 
 (defn publication-page [{:keys [params session]}]
   (let [id (:id (:identity session nil) nil)]
@@ -66,13 +68,15 @@
   (layout/render
    "content/publications/publication.html" {:user (first (db/get-user {:id (:id (:identity session))}))
                                             :publication (first (db/get-publication {:id (Integer/valueOf (:id params))}))
-                                            :authors (db/get-authors-of-publication {:pub_id (Integer/valueOf (:id params))})}))))
+                                            :authors (db/get-authors-of-publication {:pub_id (Integer/valueOf (:id params))})})
+      (redirect "/auth/login"))))
 
 (defn new-publication-page [{:keys [params session]}]
   (let [id (:id (:identity session nil) nil)]
     (if (and (not= id nil) (db/check-admin-user {:id id}))
   (layout/render
-   "content/publications/new_publication.html" {}))))
+   "content/publications/new_publication.html" {})
+      (redirect "/auth/not-admin"))))
 
 (defn add-new-publication! [{:keys [params]}]
   (do
@@ -92,7 +96,7 @@
                                                        :publication (first (db/get-publication {:id (Integer/valueOf (:id params))}))})
       (redirect (str "/content/publications/" (:id params))))))
 
-(defn edit-publication! [{:keys [params session]}]
+(defn edit-publication! [{:keys [params]}]
   (if (validators/validate-publication-edition params)
     (do
       (db/update-publication!
@@ -104,13 +108,16 @@
                         :journal_ref (:journal_ref params)
                         :comments (:comments params)
                         :date_created (:date_created params)
-                        :date_updated (:date_updated params) })
+                        :date_updated (:date_updated params)})
       (redirect (str "/content/publications/" (:id params))))
     (redirect (str "/content/publications/" (:id params) "/edit"))))
 
 
-(defn author-page [{:keys [params]}]
+(defn author-page [{:keys [params session]}]
+(let [id (:id (:identity session nil) nil)]
+ (if (not= id nil)
   (layout/render
    "content/authors/author.html"
      {:author (first (db/get-author {:id (Integer/valueOf (:id params))}))
-      :publications (db/get-publications-by-author {:author_id (Integer/valueOf (:id params))})}))
+      :publications (db/get-publications-by-author {:author_id (Integer/valueOf (:id params))})})
+       (redirect "/auth/login"))))

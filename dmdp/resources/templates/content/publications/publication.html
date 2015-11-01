@@ -9,10 +9,10 @@ Pubication: {{ publication.title }}
         Title: {{ publication.title }} </br>
         Uploaded: {{ publication.date_created|date:"yyyy-MM-dd" }} </br>
         Last update: {{ publication.date_updated|date:"yyyy-MM-dd" }} ({{ publication.date_updated|from-today }})</br>
-        Journal reference: {{ publication.journal_ref }} </br>
-        <b> Abstract thesis: </br> {{ publication.abstract }} </br></b>
-        DOI: {{ publication.doi }} </br>
-        Comments: {{ publication.comments }} </br>
+        {% if publication.journal_ref|empty? %}{% else %} Journal reference: {{ publication.journal_ref }} </br> {% endif %}
+        {% if publication.abstract|empty? %}Abstract thesis: </br> {{ publication.abstract }} </br>  {% endif %}
+        {% if publication.doi|empty? %}DOI: {{ publication.doi }} </br>  {% endif %}
+        {% if publication.comments|empty? %}Comments: {{ publication.comments }} </br>  {% endif %}
 
         Categories: </br>
 

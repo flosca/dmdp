@@ -105,6 +105,9 @@ SET uid = :uid, title = :title, date_created = date(:date_created), date_updated
   comments = :comments
 WHERE id = :id
 
+-- name: delete-publication!
+delete from dmd.publications where id = :id
+
 -- name: bind-publication-to-author!
 -- bind a publication to an author
 INSERT INTO dmd.author_of
