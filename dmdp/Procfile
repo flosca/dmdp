@@ -1,1 +1,0 @@
-web: java $JVM_OPTS -cp target/dmdp.jar clojure.main -m dmdp.core
