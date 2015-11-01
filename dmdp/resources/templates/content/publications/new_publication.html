@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block page-scripts %}
+<script src="/js/addAuthors.js" language="Javascript" type="text/javascript"></script>
+{% endblock %}
+
+{% block content %}
+
+<form action="" method="POST" class="input-form"> {% csrf-field %}
+    <h3>New publication:</h3>
+    <table>
+        <tr>
+            <td>Title: </td>
+            <td><input type="text" name="title" id="title" value="{{ publication.title }}"></td>
+        </td>
+        <tr>
+            <td>Abstract: </td>
+            <td><input type="text" name="abstract" id="abstract" value="{{ publication.abstract }}"></td>
+        </td>
+        <tr>
+            <td>Universal ID: </td>
+            <td><input type="text" name="uid" id="uid" value="{{ publication.uid }}"></td>
+        </td>
+        <tr>
+            <td>Journal reference: </td>
+            <td><input type="text" name="journal_ref" id="journal_ref" value="{{ publication.journal_ref }}"></td>
+        </tr>
+        <tr>
+            <td>DOI: </td>
+            <td><input type="text" name="doi" id="doi" value="{{ publication.doi }}" ></td>
+        </tr>
+        <tr>
+            <td>Comments: </td>
+            <td><input type="text" name="comments" id="comments" value="{{ publication.comments }}"></td>
+        </tr>
+        <tr>
+            <td>Date created: </td>
+            <td><input type="text" name="date_created" id="date_created" value="{{ publication.date_created }}"></td>
+        </tr>
+        <tr>
+            <td>Date updated: </td>
+            <td><input type="text" name="date_updated" id="date_updated" value="{{ publication.date_updated }}"></td>
+        </tr>
+    </table>
+</br>
+
+<h3>Author:</h3>
+    <table>
+        <tr>
+            <td>Keyname: </td>
+            <td><input type="text" name="keyname" id="keyname" ></td>
+        </td>
+        <tr>
+            <td>Forenames: </td>
+            <td><input type="text" name="forenames" id="forenames" ></td>
+        </td>
+        <tr>
+            <td>Affiliations: </td>
+            <td><input type="text" name="affiliation" id="affiliation" ></td>
+        </tr>
+    </table>
+</br>
+
+<!--    <form>
+         <input type="button" id="button" value="Add new author" onClick="createAuthorForm(5);">
+    </form> -->
+
+         <tr>
+            <td colspan="2"><input type="submit" value="Save"></td>
+        </tr>
+</form>
+{% endblock %}
+

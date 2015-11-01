@@ -26,8 +26,8 @@ WHERE email = :email;
 DELETE FROM dmd.users
 WHERE id = :id
 
-
-
+-- name: check-admin-user
+select admin from dmd.users where id = :id
 
 -- name: get-authors
 -- get a list of authors
@@ -44,11 +44,11 @@ SELECT distinct * FROM dmd.authors WHERE keyname = :keyname and forenames = :for
 -- name: search-author-by-name
 SELECT distinct * FROM dmd.authors WHERE keyname like :keyname or forenames like :forenames limit 10
 
--- name: create-author!
+-- name: create-author
 -- create an author
 INSERT INTO dmd.authors
-(keyname, forenames, date_of_birthday, affiliation)
-VALUES (:keyname, :forenames, :date_of_birthday, :affiliation)
+(keyname, forenames, affiliation)
+VALUES (:keyname, :forenames, :affiliation) returning id
 
 -- name: update-author!
 -- update an author's info
@@ -92,18 +92,17 @@ SELECT * FROM dmd.publications WHERE id in
   (SELECT publication_id FROM dmd.author_of WHERE author_id in
     (select id from dmd.authors where keyname = :keyname and forenames = :forenames))
 
--- name: create-publication!
--- create a publication
+-- name: create-publication
 INSERT INTO dmd.publications
-(uid, title, date_created, date_updated, journal_ref, abstract, doi, isbn, subcategories, comments)
-VALUES (:uid, :title, :date_created, :date_updated, :journal_ref, :abstract, :doi, :isbn, :subcategories, :comments)
+(uid, title, date_created, date_updated, journal_ref, abstract, doi, comments)
+VALUES (:uid, :title, date(:date_created), date(:date_updated), :journal_ref, :abstract, :doi, :comments) returning id
 
 -- name: update-publication!
 -- update a publication info
 UPDATE dmd.publications
-SET uid = :uid, title = :title, date_created = :date_created, date_updated = :date_updated,
-  journal_ref = :journal_ref, abstract = :abstract, doi = :doi, isbn = :isbn,
-  subcategories = :subcategories, comments = :comments
+SET uid = :uid, title = :title, date_created = date(:date_created), date_updated = date(:date_updated),
+  journal_ref = :journal_ref, abstract = :abstract, doi = :doi,
+  comments = :comments
 WHERE id = :id
 
 -- name: bind-publication-to-author!

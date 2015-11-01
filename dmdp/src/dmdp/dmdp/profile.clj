@@ -21,7 +21,7 @@
       (redirect "/auth/login"))))
 
 (defn edit-profile! [{:keys [params session]}]
-  (if (validators/validate-edition params)
+  (if (validators/validate-user-edition params)
     (do
       (db/update-user! {:id (:id (:identity session))
                         :first_name (:first_name params)

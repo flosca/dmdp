@@ -6,15 +6,13 @@ Pubication: {{ publication.title }}
 
 {% block content %}
     <div class="content">
-        {{ publication.title }} </br>
-        {{ publication.date_created }} </br>
-        {{ publication.date_updated }} </br>
-        {{ publication.journal_ref }} </br>
-        {{ publication.abstract }} </br>
-        {{ publication.doi }} </br>
-        {{ publication.isbn }} </br>
-        {{ publication.subcategories }} </br>
-        {{ publication.comments }} </br>
+        Title: {{ publication.title }} </br>
+        Uploaded: {{ publication.date_created|date:"yyyy-MM-dd" }} </br>
+        Last update: {{ publication.date_updated|date:"yyyy-MM-dd" }} ({{ publication.date_updated|from-today }})</br>
+        Journal reference: {{ publication.journal_ref }} </br>
+        <b> Abstract thesis: </br> {{ publication.abstract }} </br></b>
+        DOI: {{ publication.doi }} </br>
+        Comments: {{ publication.comments }} </br>
 
         Categories: </br>
 
@@ -25,7 +23,10 @@ Pubication: {{ publication.title }}
         Authors: </br>
 
         {% for author in authors %}
-            <a href="/content/authors/{{ author.id }}">{{ author.keyname }}</a> </br>
+            <a href="/content/authors/{{ author.id }}">{{ author.keyname }} {{ author.forenames }} </a> </br>
         {% endfor %}
+
+
+{% if user.admin %} <h3><a href="/content/publications/{{ publication.id }}/edit"> Edit publication </a></h3> {% else %} {% endif %}
     </div>
 {% endblock %}

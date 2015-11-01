@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block title %}
+Edit profile: {{ user.first_name }} {{ user.last_name }}
+{% endblock %}
+
 {% block content %}
 <form action="" method="POST" class="input-form"> {% csrf-field %}
     <table>

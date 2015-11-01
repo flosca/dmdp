@@ -31,10 +31,15 @@
          :pass validators/required)
        (is-user-unique? params)))
 
-(defn validate-edition [params]
+(defn validate-user-edition [params]
   (bouncer/valid?
    params
    :first_name validators/required
    :last_name validators/required
    :email validators/required))
+
+(defn validate-publication-edition [params]
+  (bouncer/valid?
+   params
+   :title validators/required))
 

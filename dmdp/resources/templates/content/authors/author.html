@@ -1,14 +1,12 @@
 {% extends "base.html" %}
 
 {% block title %}
-Author: {{ author.keyname }}
+Author: {{ author.keyname }} {{ author.forenames }}
 {% endblock %}
 
 {% block content %}
     <div class="content">
-        Keyname: {{ author.keyname }} </br>
-        Connected forenames: {{ author.forenames }} </br>
-        Birthday: {{ author.date_of_birthday }} </br>
+        {{ author.keyname }} {{ author.forenames }} </br>
         Affiliation: {{ author.affiliation }} </br>
 
         </br>
