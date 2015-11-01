@@ -53,7 +53,7 @@ VALUES (:keyname, :forenames, :affiliation) returning id
 -- name: update-author!
 -- update an author's info
 UPDATE dmd.authors
-SET keyname = :keyname, forenames = :forenames, date_of_birthday = :date_of_birthday, affiliation = :affiliation
+SET keyname = :keyname, forenames = :forenames, affiliation = :affiliation
 WHERE id = :id
 
 -- name: get-publications

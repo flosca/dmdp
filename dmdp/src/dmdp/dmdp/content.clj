@@ -49,7 +49,7 @@
   (layout/render
    "content/categories/categories.html" {:categories (db/get-categories)
                                          :identity (:identity session)})
-  (layout/render "/auth/login"))))
+  (redirect "/auth/login"))))
 
 (defn authors-page [{:keys [params session]}]
   (let [id (:id (:identity session nil) nil)
@@ -64,7 +64,7 @@
                        :identity (:identity session)})
                                      :prev_page_offset (if (< (- offset limit) 0) 0 (- offset limit))
                                      :next_page_offset (+ offset limit)})
-       (layout/render "/auth/login"))))
+       (redirect "/auth/login"))))
 
 
 (defn author-page [{:keys [params session]}]
@@ -75,25 +75,25 @@
      {:author (first (db/get-author {:id (Integer/valueOf (:id params))}))
       :publications (db/get-publications-by-author {:author_id (Integer/valueOf (:id params))})
       :identity (:identity session)})
-          (layout/render "/auth/login"))))
+          (redirect "/auth/login"))))
 
 
 (defn publications-page [{:keys [params session]}]
   (let [id (:id (:identity session nil) nil)
         limit (Integer/valueOf (:limit params "10"))
         offset (Integer/valueOf (:offset params "0"))
-        order_by (str (nth (split (:sort_by params "title-asc") #"-") 0) " " (nth (split (:sort_by params "title-asc") #"-") 1))]
-    (println order_by)
+        order_by (str (nth (split (:sort_by params "date_updated-asc") #"-") 0) " " (nth (split (:sort_by params "date_updated-asc") #"-") 1))]
+    ;(println order_by)
    (if (not= id nil)
   (layout/render
-   "content/publications/publications.html" {:publications (db/get-publications {:offset offset
+   "content/publications/publications.html" {:identity (:identity session)
+                                             :publications (db/get-publications {:offset offset
                                                                                  :limit limit
-                                                                                 :identity (:identity session)
                                                                                  :order_by order_by})
                                              :prev_page_offset (if (< (- offset limit) 0) 0 (- offset limit))
                                              :next_page_offset (+ offset limit)
                                              :sort_by (:sort_by params "title-asc")})
-  (layout/render "/auth/login"))))
+  (redirect "/auth/login"))))
 
 
 (defn publication-page [{:keys [params session]}]
@@ -105,14 +105,14 @@
                                               :authors (db/get-authors-of-publication {:pub_id pub-id})
                                               :categories (db/get-publication-categories {:publication_id pub-id})
                                               :identity (:identity session)})
-      (layout/render "/auth/login"))))
+      (redirect "/auth/login"))))
 
 
 (defn new-publication-page [{:keys [params session]}]
   (let [id (:id (:identity session nil) nil)]
     (if (and (not= id nil) (db/check-admin-user {:id id}))
   (layout/render
-   "content/publications/new_publication.html" {})
+   "content/publications/new_publication.html" {:identity (:identity session)})
       (redirect "/auth/not-admin"))))
 
 (defn add-new-publication! [{:keys [params]}]
@@ -130,7 +130,8 @@
     (if (and (not= id nil) (db/check-admin-user {:id id}))
       (layout/render
          "content/publications/edit_publication.html" {:user (first (db/get-user {:id (:id (:identity session))}))
-                                                       :publication (first (db/get-publication {:id (Integer/valueOf (:id params))}))})
+                                                       :publication (first (db/get-publication {:id (Integer/valueOf (:id params))}))
+                                                       :identity (:identity session)})
       (redirect (str "/content/publications/" (:id params))))))
 
 (defn edit-publication! [{:keys [params]}]

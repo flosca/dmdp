@@ -56,4 +56,10 @@ create table if not exists dmd.related_to (
   foreign key (publication_id) references dmd.publications(id),
   foreign key (related_publication_id) references dmd.publications(id));
 
+create index pub_search_idx on dmd.publications using gin
+(to_tsvector('english', title || ' ' || abstract || ' ' || journal_ref || ' ' || comments));
+
+create index pub_asc_index on dmd.publications (title asc nulls first);
+create index pub_desc_index on dmd.publications (title desc nulls last);
+
 commit;

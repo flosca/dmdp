@@ -8,7 +8,7 @@ Search {% if query %}: query = {{ query }} {% endif %}
     <h2><a href="/content/search">Search page</a></h2>
 
     <form>
-        <input type="text" name="q" id="query" placeholder="Enter your query here.." value="{{query}}">
+        <input type="text" name="q" id="query" placeholder="Enter your query here" value="{{query}}">
     </form>
     </br>
     {% if publications %}
@@ -30,18 +30,6 @@ Search {% if query %}: query = {{ query }} {% endif %}
 
             <a href="/content/search?{% if query %}q={{ query }}{% endif %}{% if category_id %}&category={{ category_id }}{% endif %}{% if prev_page_offset %}&offset={{ prev_page_offset }}{% endif %}">&lt;&lt; Previous page</a>
             <a class="float-right" href="/content/search?{% if query %}q={{ query }}{% endif %}{% if category_id %}&category={{ category_id }}{% endif %}{% if next_page_offset %}&offset={{ next_page_offset }}{% endif %}">Next page &gt;&gt;</a>
-        {% else %}
-            No results for your query.
-        {% endif %}
-    {% endif %}
-
-    {% if authors %}
-      <b>Authors containing "{{query}}" in name:</b> </br>
-
-        {% if authors|length > 0 %}
-            {% for author in authors %}
-                <a href="/content/authors/{{ author.id }}"> {{ author.keyname }}, {{ author.forenames }} </a> </br>
-            {% endfor %} </br>
         {% else %}
             No results for your query.
         {% endif %}

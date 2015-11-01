@@ -10,9 +10,10 @@ Profile: {{ user.first_name }} {{ user.last_name }}
         Last name: {{ user.last_name }} <br/>
         Email: {{ user.email }} <br/>
         <hr/>
-        <a href="/profile/edit" class="float-right">Edit profile</a>
+        <a href="/profile/edit" class="float-right">Edit profile</a></br>
+        {% if user.admin %} <a href="/content/new-publication" class="float-right"> Add new publication </a> {% else %} {% endif %}
     </div>
 
-{% if user.admin %} <h3><a href="/content/new-publication"> Add new publication </a></h3> {% else %} {% endif %}
+
 
 {% endblock %}

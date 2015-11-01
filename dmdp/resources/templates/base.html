@@ -24,7 +24,7 @@
             </div>
             <div class="float-right">
                 {% if identity %}
-                    <a href="/profile">Identity: {{ identity.name }}</a>
+                    <a href="/profile">{{ identity.name }}</a>
                     <a href="/auth/logout">Logout</a>
                 {% else %}
                     <a href="/auth/login">Login</a>

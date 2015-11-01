@@ -35,7 +35,7 @@
   (GET "/content/categories" req (content/categories-page req)))
 
 (defroutes public-routes
-  (GET "/auth/login" [] (auth/login-page))
+  (GET "/auth/login" req (auth/login-page req))
   (POST "/auth/login" req (auth/login! req))
   (GET "/auth/not-admin" [] (auth/not-admin-page))
   (GET "/auth/logout" req (auth/logout-page req)))
