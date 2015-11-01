@@ -5,7 +5,7 @@ Search {% if query %}: query = {{ query }} {% endif %}
 {% endblock %}
 
 {% block content %}
-    <h2><a href="/search">Search page</a></h2>
+    <h2><a href="/content/search">Search page</a></h2>
 
     <form>
         <input type="text" name="q" id="query" placeholder="Enter your query here.." value="{{query}}">
@@ -19,10 +19,17 @@ Search {% if query %}: query = {{ query }} {% endif %}
             <b>Publications of category "{{ category_name }}":</b> </br>
         {% endif %}
 
+        </br>
+
         {% if publications|length > 0 %}
             {% for publication in publications %}
                 <a href="/content/publications/{{ publication.id }}"> {{ publication.title }} </a> </br>
             {% endfor %} </br>
+
+            <hr/>
+
+            <a href="/content/search?{% if query %}q={{ query }}{% endif %}{% if category_id %}&category={{ category_id }}{% endif %}{% if prev_page_offset %}&offset={{ prev_page_offset }}{% endif %}">&lt;&lt; Previous page</a>
+            <a class="float-right" href="/content/search?{% if query %}q={{ query }}{% endif %}{% if category_id %}&category={{ category_id }}{% endif %}{% if next_page_offset %}&offset={{ next_page_offset }}{% endif %}">Next page &gt;&gt;</a>
         {% else %}
             No results for your query.
         {% endif %}

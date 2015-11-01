@@ -2,7 +2,8 @@
   (:require [dmdp.layout :as layout]
             [dmdp.db.core :as db]
             [clojure.java.io :as io]
-            [ring.util.response :refer [redirect response]]))
+            [ring.util.response :refer [redirect response]]
+            [clojure.string :refer [split]]))
 
 (defn home-page [{:keys [session]}]
   (layout/render
@@ -19,21 +20,26 @@
       (layout/render
        "content/search.html" {:publications
                               (cond
-                               (and (not= category_id nil) (not= title nil)) (do (println "1\n") (db/get-publications-by-title-from-category
+                               (and (not= category_id nil) (not= title nil)) (db/get-publications-by-title-from-category
                                                                                                   {:category_id category_id
                                                                                                    :title title
                                                                                                    :limit limit
-                                                                                                   :offset offset})) ; by title and category
+                                                                                                   :offset offset}) ; by title and category
                                (not= category_id nil) (db/get-publications-from-category-by-category-id
                                                        {:category_id category_id
                                                         :limit limit
                                                         :offset offset})
-                               (not= title nil) (db/get-publications-by-title {:title title})
+                               (not= title nil) (db/get-publications-by-title {:title title
+                                                                               :limit limit
+                                                                               :offset offset})
                                :else (do (println "No filter!\n") []))
                              :authors (db/search-author-by-name {:keyname (str "%" (:q params) "%") :forenames (str "%" (:q params) "%")})
                              :query (:q params)
                              :category_name (if (= category_id nil) nil (:category_name (first (db/get-category-name-by-id {:id category_id}))))
-                             :identity (:identity session)}))))
+                             :category_id category_id
+                             :identity (:identity session)
+                             :prev_page_offset (if (< (- offset limit) 0) 0 (- offset limit))
+                             :next_page_offset (+ offset limit)}))))
 
 (defn categories-page [{:keys [params session]}]
   (layout/render
@@ -41,18 +47,30 @@
                                          :identity (:identity session)}))
 
 (defn authors-page [{:keys [params session]}]
-  (layout/render
-   "content/authors/authors.html" {:authors
-                   (db/get-authors
-                    {:limit (Integer/parseInt (:limit params "20"))
-                     :offset (Integer/parseInt (:offset params "20"))
-                     :identity (:identity session)})}))
+  (let [limit (Integer/parseInt (:limit params "10"))
+        offset (Integer/parseInt (:offset params "0"))]
+    (layout/render
+     "content/authors/authors.html" {:authors
+                     (db/get-authors
+                      {:limit limit
+                       :offset offset
+                       :identity (:identity session)})
+                                     :prev_page_offset (if (< (- offset limit) 0) 0 (- offset limit))
+                                     :next_page_offset (+ offset limit)})))
 
 (defn publications-page [{:keys [params session]}]
+  (let [limit (Integer/valueOf (:limit params "10"))
+        offset (Integer/valueOf (:offset params "0"))
+        order_by (str (nth (split (:sort_by params "title-asc") #"-") 0) " " (nth (split (:sort_by params "title-asc") #"-") 1))]
+    (println order_by)
   (layout/render
-   "content/publications/publications.html" {:publications (db/get-publications {:offset (Integer/valueOf (:offset params "20"))
-                                                                                 :limit (Integer/valueOf (:limit params "20"))
-                                                                                 :identity (:identity session)})}))
+   "content/publications/publications.html" {:publications (db/get-publications {:offset offset
+                                                                                 :limit limit
+                                                                                 :identity (:identity session)
+                                                                                 :order_by order_by})
+                                             :prev_page_offset (if (< (- offset limit) 0) 0 (- offset limit))
+                                             :next_page_offset (+ offset limit)
+                                             :sort_by (:sort_by params "title-asc")})))
 
 (defn publication-page [{:keys [params session]}]
   (let [id (Integer/parseInt (:id params))]

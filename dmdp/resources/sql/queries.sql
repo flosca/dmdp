@@ -58,7 +58,7 @@ WHERE id = :id
 
 -- name: get-publications
 -- get a list of publications
-SELECT * FROM dmd.publications OFFSET :offset LIMIT :limit
+SELECT * FROM dmd.publications order by :order_by OFFSET :offset LIMIT :limit
 
 -- name: get-publication
 -- get a specific publication by id
@@ -80,7 +80,7 @@ select count(*) from dmd.publications where id in
 
 -- name: get-publications-by-title
 -- get a list of publications
-SELECT * FROM dmd.publications WHERE title like :title limit 10
+SELECT * FROM dmd.publications WHERE title like :title limit :limit offset :offset
 
 -- name: get-publications-by-title-from-category
 -- get a list of publications

@@ -5,13 +5,11 @@ Profile: {{ user.email %}
 {% endblock %}
 
 {% block content %}
-    First name: {{ user.first_name }} <br/>
-    Last name: {{ user.last_name }} <br/>
-    Email: {{ user.email }} <br/>
-
-
-
-    {% for publication in publications %}
-        <a href="/content/publications/{{publication.id}}">{{publication.title}}</a> </br>
-    {% endfor %}
+    <div class="input-form">
+        First name: {{ user.first_name }} <br/>
+        Last name: {{ user.last_name }} <br/>
+        Email: {{ user.email }} <br/>
+        <hr/>
+        <a href="/profile/edit" class="float-right">Edit profile</a>
+    </div>
 {% endblock %}

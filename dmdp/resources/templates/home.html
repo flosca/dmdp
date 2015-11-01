@@ -9,6 +9,16 @@ DMDP: Main page
     <h1>Welcome to DMDP - neat management system for storing scientific publications.</h1>
   </div>
 
+<img src="/images/science.png" class="border-radius-7"/>
+
+</br>
+
+<div class="centered-block">
+    <button class="btn-big" onclick="window.location='/content/search';">Search</button>
+    <button class="btn-big" onclick="window.location='/content/publications';">Publications</button>
+    <button class="btn-big" onclick="window.location='/content/authors';">Authors</button>
+</div>
+
 <div>
   {% for author in authors %}
     {{ author.keyname }}
@@ -36,6 +46,5 @@ DMDP: Main page
         {{ author.keyname }}
     {% endfor %}
   {% endfor %}
-
-
+</div>
 {% endblock %}
