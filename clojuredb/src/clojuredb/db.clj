@@ -5,6 +5,7 @@
 (defn reload [] (use 'clojuredb.db :reload)) ;; for simplified developing in repl
 
 (def META-TABLE-BYTES-LENGTH 9)
+(def PAGE-DESCRIPTOR-BYTES-LENGTH 36)
 
 (defn values->data
   [table-id table-title]
@@ -32,7 +33,8 @@
     {:table-id table-id
      :table-name table-name
      :attributes attributes
-     :index-descriptors []})
+     :index-descriptors []
+     :page-descriptors []})
 
 (defn generate-attribute
   [a-id a-name a-flags type]
@@ -52,8 +54,8 @@
 
 (defn generate-page-descriptor
   [page-id offset]
-  {:page-id page-id
-   :offset offset})
+  {:page-id (Integer/valueOf page-id)
+   :offset  (Integer/valueOf offset)})
 
 (defn generate-page
   ([table-id page-id records]
@@ -82,6 +84,32 @@
    (generate-header)
    (read-header db-title)))))
 
+(defn read-page
+  [db-title table-id page-id]
+  (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
+  (let [header (get-header db-title)
+        page-descriptor (->> header
+                             :table-descriptors
+                             (filter #(= table-id (:table-id %)))
+                             first
+                             :page-descriptors
+                             (filter #(= page-id (:page-id %)))
+                             first)
+        offset (:offset page-descriptor)
+        buf (byte-array PAGE-DESCRIPTOR-BYTES-LENGTH)]
+    (.seek raf offset)
+    (.read raf buf)
+    (nippy/thaw buf))))
+
+(defn get-page
+  [db-title table-id page-id]
+  (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
+  (let [length (.length raf)]
+  (if (< 0 length)
+   (generate-page table-id page-id)
+   (read-page db-title table-id page-id)))))
+
+
 
 (defn add-table
   [db-title table-name attributes]
@@ -101,9 +129,3 @@
 (defn insert
   [db-title table-name record]
   )
-
-#_(defn read-database-meta
-  [db-title]
-  (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
-     (.seek raf 0)
-     (.read raf (values->data table-id table-title))))
