@@ -4,5 +4,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [b-plus-tree "0.3.0"]]
-  :main clojuredb.core)
+                 ;[b-plus-tree "0.3.0"]
+                 ;[gloss "0.2.2"]
+                 [com.taoensso/nippy "2.10.0"]]
+  :main clojuredb.db)

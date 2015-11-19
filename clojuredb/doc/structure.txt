@@ -4,3 +4,6 @@ Database internal structure
 Each database represents in a single file.
 
 First byte represents an amount of pages.
+
+
+Encoding {:}
