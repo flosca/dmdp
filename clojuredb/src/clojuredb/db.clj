@@ -4,8 +4,16 @@
 
 (defn reload [] (use 'clojuredb.db :reload)) ;; for simplified developing in repl
 
+; ---- BYTES LENGTH FOR DIFFERENT DATA TYPES
 (def META-TABLE-BYTES-LENGTH 9)
 (def PAGE-DESCRIPTOR-BYTES-LENGTH 36)
+; ------------------------------------------
+; ---- BIT FLAG CONSTANTS
+(def FLAG-PRIMARY-KEY 1)
+; ------------------------------------------
+; ---- OTHER CONSTANTS
+(def PAGES-PER-TABLE 37)
+;-------------------------------------------
 
 (defn read-header-size
   "Returns the size of this shit"
@@ -24,7 +32,7 @@
 
 (defn generate-table-descriptor
   [table-id table-name attributes]
-    {:table-id table-id
+    {:table-id (Integer/valueOf table-id)
      :table-name table-name
      :attributes attributes
      :index-descriptors []
@@ -32,10 +40,10 @@
 
 (defn generate-attribute
   [a-id a-name a-flags type]
-  {:a-id a-id
+  {:a-id (Integer/valueOf a-id)
    :a-name a-name
-   :a-flags a-flags
-   :type type})
+   :a-flags (Integer/valueOf a-flags)
+   :type (Integer/valueOf type)})
 
 (defn generate-index-descriptor
   []
@@ -43,8 +51,8 @@
 
 (defn generate-attribute-descriptor
   [id offset]
-  {:id id
-   :idx-offset offset})
+  {:id (Integer/valueOf id)
+   :idx-offset (Integer/valueOf offset)})
 
 (defn generate-page-descriptor
   [page-id offset]
@@ -52,14 +60,14 @@
    :offset  (Integer/valueOf offset)})
 
 (defn generate-page
-  ([table-id page-id]
-    {:table-id table-id
-     :page-id page-id
-     :records []})
   ([table-id page-id records]
-    {:table-id table-id
-     :page-id page-id
-     :records records}))
+    {:table-id (Integer/valueOf table-id)
+     :page-id (Integer/valueOf page-id)
+     :records records})
+  ([table-id page-id]
+    {:table-id (Integer/valueOf table-id)
+     :page-id (Integer/valueOf page-id)
+     :records []}))
 
 (defn generate-record
   ([]
@@ -69,7 +77,7 @@
 
 (defn generate-field
  [attribute-id value]
-  {:attribute-id attribute-id
+  {:attribute-id (Integer/valueOf attribute-id)
    :value value})
 
 (defn read-header
@@ -114,7 +122,25 @@
    (generate-page table-id page-id)
    (read-page db-title table-id page-id)))))
 
+(defn get-attributes
+  [db-title table-name]
+  (let [table-descriptors (:table-descriptors (get-header db-title))
+        attributes (filter #(= table-name (:table-name %)) table-descriptors)]
+        attributes))
 
+(defn calc-record-hash
+  [db-title table-name record]
+  (loop [i 0
+         hash-acc 0
+         attributes (get-attributes db-title table-name)]
+         (if (< i (count record))
+          (recur (inc i) (let [current-attribute (nth attributes i)
+                               current-attribute-flags (:flags current-attribute)
+                               current-field (nth record i)
+                               current-field-value-hash (hash (:value current-field))
+                            (if (= (bit-and (current-attribute-flags FLAG-PRIMARY-KEY)) 1)
+                                (+ hash-acc current-field-value-hash) hash-acc)) attributes)
+          (Math/abs (quot (Math/abs hash-acc) PAGES-PER-TABLE)))))
 
 (defn add-table
   [db-title table-name attributes]
