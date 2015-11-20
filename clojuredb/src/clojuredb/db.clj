@@ -7,12 +7,6 @@
 (def META-TABLE-BYTES-LENGTH 9)
 (def PAGE-DESCRIPTOR-BYTES-LENGTH 36)
 
-(defn values->data
-  [table-id table-title]
-  (nippy/freeze {:table-id table-id
-                 :table-title table-title}))
-
-
 (defn read-header-size
   "Returns the size of this shit"
   [db-title]
@@ -58,14 +52,25 @@
    :offset  (Integer/valueOf offset)})
 
 (defn generate-page
-  ([table-id page-id records]
-    {:table-id table-id
-     :page-id page-id
-     :records records})
   ([table-id page-id]
     {:table-id table-id
      :page-id page-id
-     :records []}))
+     :records []})
+  ([table-id page-id records]
+    {:table-id table-id
+     :page-id page-id
+     :records records}))
+
+(defn generate-record
+  ([]
+  {:fields []})
+  ([fields]
+  {:fields fields}))
+
+(defn generate-field
+ [attribute-id value]
+  {:attribute-id attribute-id
+   :value value})
 
 (defn read-header
    [db-title]
@@ -105,7 +110,7 @@
   [db-title table-id page-id]
   (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
   (let [length (.length raf)]
-  (if (< 0 length)
+  (if (> length PAGE-DESCRIPTOR-BYTES-LENGTH)
    (generate-page table-id page-id)
    (read-page db-title table-id page-id)))))
 
@@ -126,6 +131,38 @@
       (.write raf size)
       (.write raf data))))
 
+(defn get-page-descriptors
+  [header table-name]
+  (->> header
+       :table-descriptors
+       (filter #(= table-name (:table-name %)))
+       first
+       :page-descriptors))
+
+(defn get-table-id
+  [header table-name]
+  (->> header
+       :table-descriptors
+       (filter #(= table-name (:table-name %)))
+       first
+       :table-id)))
+
+
 (defn insert
   [db-title table-name record]
-  )
+  (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
+  (let [header (get-header db-title)
+        table-id (get-table-id header table-name)
+        page-descriptors (get-page-descriptors header table-name))
+        page-id (calc-record-hash db-title table-name record)]
+ (if (some #(= page-id (:page-id %))
+    ; if table already has page with such id
+    (let [page (get-page db-title table-id page-id)]
+    (write-page (generate-page (:table-id page) (:page-id page) (conj records record))))
+    ; if table does not have the page
+
+
+
+   (generate-header (conj (header :table-descriptors) ,,,)))
+
+        ;page (get-page db-title table-id 0 #_(calc-record-hash record))]
