@@ -33,10 +33,10 @@
              pos-write (dec (+ (.length raf) count))]
             (if (>= i pos-start)
                 (do
-                  (printf "pr: %s, pw: %s; " pos-read pos-write)
+                   (printf "pr: %s, pw: %s; " pos-read pos-write)
                   (let [current-byte (do (.seek raf pos-read)
                                          (.read raf))]
                     (.seek raf pos-write)
-                    (.write raf current-byte))
-                  (recur (dec i) (dec pos-read) (dec pos-write)))))
+                    (.write raf current-byte)))
+                  (recur (dec i) (dec pos-read) (dec pos-write))))
       (.setLength raf (+ (.length raf) (if (<= count 0) count 0) ))))
