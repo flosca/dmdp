@@ -1,6 +1,6 @@
 (ns dmdp.dmdp.content
   (:require [dmdp.layout :as layout]
-            [dmdp.db.core :as db]
+            [dmdp.newdb.core :as db]
             [clojure.java.io :as io]
             [ring.util.response :refer [redirect response]]
             [dmdp.dmdp.validators :as validators]
@@ -149,5 +149,3 @@
                         :date_updated (:date_updated params)})
       (redirect (str "/content/publications/" (:id params))))
     (redirect (str "/content/publications/" (:id params) "/edit"))))
-
-

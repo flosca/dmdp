@@ -1,7 +1,7 @@
 (ns dmdp.dmdp.profile
   (:require [dmdp.layout :as layout]
             [ring.util.response :refer [response redirect]]
-            [dmdp.db.core :as db]
+            [dmdp.newdb.core :as db]
             [dmdp.dmdp.validators :as validators]))
 
 (defn profile-page [{:keys [params session]}]
@@ -9,9 +9,7 @@
     (if (not= id nil)
       (layout/render
          "profile/profile.html" {:user (first (db/get-user {:id id}))
-                                 :identity (:identity session)
-         ;:publications (db/get-publications-by-author {:author_id (Integer/parseInt (:id params))})}))
-                           })
+                                 :identity (:identity session)})
       (redirect "/auth/login"))))
 
 (defn edit-profile-page [{:keys [params session]}]

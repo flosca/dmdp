@@ -1,7 +1,7 @@
-(ns clojuredb.db
+(ns dmdp.dbms.db
     (:require [taoensso.nippy :as nippy]
-              [clojuredb.join :refer [natural-join cross-join]])
-    (:use     [clojuredb.utils]))
+              [dmdp.dbms.join :refer [natural-join cross-join]])
+    (:use     [dmdp.dbms.utils]))
 
 (defn reload [] (use 'clojuredb.db :reload)) ;; for simplified developing in repl
 
@@ -363,18 +363,18 @@
     [value]
     (= value 1))
 
-    (defn select
-      [db-title table-name attr-preds]
-      (map #(apply merge %)
-     (->> attr-preds
-      (map (fn [c]
-        (filter (fn [v] (println v) (some
-           #(and (= (first c) (:attribute-id %))
-                 ((second c) (:value %))) v)) (projection db-title table-name))))
-      (map set)
-      (reduce clojure.set/intersection)
-      (vec)
-      (map (fn [e] (map #(field->hash-map db-title table-name %) e))))))
+(defn select
+  [db-title table-name attr-preds]
+  (map #(apply merge %)
+ (->> attr-preds
+  (map (fn [c]
+    (filter (fn [v] (println v) (some
+       #(and (= (first c) (:attribute-id %))
+             ((second c) (:value %))) v)) (projection db-title table-name))))
+  (map set)
+  (reduce clojure.set/intersection)
+  (vec)
+  (map (fn [e] (map #(field->hash-map db-title table-name %) e))))))
 
 
 (defn nat-join

@@ -4,7 +4,8 @@
             [dmdp.db.migrations :as migrations]
             [clojure.tools.nrepl.server :as nrepl]
             [taoensso.timbre :as timbre]
-            [environ.core :refer [env]])
+            [environ.core :refer [env]]
+            [dmdp.newdb.core :refer [prepare-database]])
   (:gen-class))
 
 (defonce nrepl-server (atom nil))
@@ -61,8 +62,10 @@
   (start-http-server (http-port port))
   (timbre/info "server started on port:" (:port @http-server)))
 
-(defn -main [& args]
-  (cond
-    (some #{"migrate" "rollback"} args) (migrations/migrate args)
-    :else (start-app args)))
-
+  (defn -main [& args]
+    (cond
+      (some #{"migrate" "rollback"} args) (migrations/migrate args)
+      :else
+           (do
+  (start-app args)
+  #_(prepare-database))))

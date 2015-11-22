@@ -25,7 +25,8 @@
                  [conman "0.2.1"]
                  [org.postgresql/postgresql "9.4-1203-jdbc41"]
                  [org.immutant/web "2.1.0"]
-                 [clj-time "0.11.0"]]
+                 [clj-time "0.11.0"]
+                 [com.taoensso/nippy "2.10.0"]]
 
   :min-lein-version "2.0.0"
   :uberjar-name "dmdp.jar"

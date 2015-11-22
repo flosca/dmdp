@@ -1,7 +1,7 @@
 (ns dmdp.dmdp.validators
   (:require [bouncer.core :as bouncer]
             [bouncer.validators :as validators]
-            [dmdp.db.core :as db]
+            [dmdp.newdb.core :as db]
             [buddy.hashers :as hashers]))
 
 (defn is-user-unique? [email]
@@ -42,4 +42,3 @@
   (bouncer/valid?
    params
    :title validators/required))
-
