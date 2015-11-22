@@ -74,7 +74,7 @@
   ([table-id page-id]
     {:table-id (Integer/valueOf table-id)
      :page-id (Integer/valueOf page-id)
-     :records []}))
+     :records #{}}))
 
 (defn generate-record
   ([]
@@ -131,9 +131,7 @@
         offset (:offset page-descriptor)]
     offset))
 
-(defn table-name->table-id
-  [db-title table-name]
-  (:table-id (get-table-descriptor db-title table-name)))
+
 
 (defn get-attributes
   [db-title table-name]
@@ -184,6 +182,12 @@
           (.setLength raf new-file-length)
           )))
 
+
+(defn get-table-attributes
+  [db-title table-name]
+  (map :id (:attributes (read-table-descriptor db-title table-name))))
+
+
 (defn add-table
   [db-title table-name attributes]
    ; TODO: recalc table-id
@@ -214,6 +218,10 @@
        (filter #(= table-name (:table-name %)))
        first))
 
+       (defn table-name->table-id
+         [db-title table-name]
+         (:table-id (read-table-descriptor db-title table-name)))
+
 (defn get-table-id
   [db-title table-name]
   (let [header (get-header db-title)]
@@ -230,11 +238,13 @@
         page-descriptor (first (filter #(= page-id (:page-id %)) page-descriptors))]
     page-descriptor))
 
+(declare calc-new-page-offset)
+
 (defn get-page-descriptor
   [db-title table-name page-id]
   (let [loaded-page-descriptor (read-page-descriptor db-title table-name page-id)]
     (if (nil? loaded-page-descriptor)
-        (let [offset (calc-new-page-offset db-title)#_(+ PAGE-SIZE (* (count (get-page-descriptors db-title table-name)) PAGE-SIZE))]
+        (let [offset (calc-new-page-offset db-title) #_(+ PAGE-SIZE (* (count (get-page-descriptors db-title table-name)) PAGE-SIZE))]
           (generate-page-descriptor page-id offset))
         loaded-page-descriptor)))
 
@@ -300,14 +310,50 @@
 
 (defn insert
   [db-title table-name record]
-  (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
     (let [page-id (calc-record-hash db-title table-name record)
           page (get-page db-title table-name page-id)
           page-offset (read-page-offset db-title table-name page-id)]
           (println (str "::PAGE-OFFSET " page-offset))
           (let [updated-records (conj (:records page) record)]
-            (write-page db-title page-offset (generate-page (table-name->table-id db-title table-name) page-id updated-records)))
-    )))
+            (write-page db-title page-offset (generate-page (table-name->table-id db-title table-name) page-id updated-records)))))
+
+(defn scan
+  [db-title table-name]
+  (let [page-descriptors (get-page-descriptors db-title table-name)]
+  (mapcat vec
+    (map #(:records (get-page db-title table-name (:page-id %))) page-descriptors))))
+
+(defn project
+  ([db-title table-name]
+  (map (fn [v]
+    (filter (fn [c]
+       (some #(= (:attribute-id c) %) (get-table-attributes db-title table-name))) v)) (scan db-title table-name)))
+  ([db-title table-name attributes]
+    (map (fn [v]
+      (filter (fn [c]
+         (some #(= (:attribute-id c) %) attributes)) v)) (scan db-title table-name))))
+
+(defn pred-equality
+  [value]
+  (= value "Vasya"))
+
+  (defn pred-equality1
+    [value]
+    (= value 1))
+
+(defn select
+  [db-title table-name attr-preds]
+ (->> attr-preds
+  (map (fn [c]
+    (filter (fn [v] (some
+       #(and (= (first c) (:attribute-id %))
+             ((second c) (:value %))) v)) (project "test" "People"))))
+  (map set)
+  (reduce clojure.set/intersection)
+  (vec)))
+
+;  (filter (fn [v] (pred v)) (project db-title table-name)))
+
 
         ;page (get-page db-title table-id 0 #_(calc-record-hash record))]
 
