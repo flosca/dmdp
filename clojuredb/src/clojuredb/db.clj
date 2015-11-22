@@ -5,7 +5,7 @@
 (defn reload [] (use 'clojuredb.db :reload)) ;; for simplified developing in repl
 
 ; ---- BYTES LENGTH FOR DIFFERENT DATA TYPES
-(def META-TABLE-BYTES-LENGTH 9)
+(def INTEGER-BYTES-LENGTH 9)
 (def PAGE-DESCRIPTOR-BYTES-LENGTH 36)
 ; ------------------------------------------
 ; ---- BIT FLAG CONSTANTS
@@ -21,7 +21,7 @@
   [db-title]
   (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
      (.seek raf 0)
-     (let [buf (byte-array META-TABLE-BYTES-LENGTH)
+     (let [buf (byte-array INTEGER-BYTES-LENGTH)
            _ (.read raf buf)]
        (nippy/thaw buf))))
 
@@ -32,18 +32,24 @@
    {:table-descriptors table-descriptors}))
 
 (defn generate-table-descriptor
-  [table-id table-name attributes]
+  ([table-id table-name attributes]
     {:table-id (Integer/valueOf table-id)
      :table-name table-name
      :attributes attributes
      :index-descriptors []
      :page-descriptors []})
+  ([table-id table-name attributes index-descriptors page-descriptors]
+    {:table-id (Integer/valueOf table-id)
+     :table-name table-name
+     :attributes attributes
+     :index-descriptors index-descriptors
+     :page-descriptors page-descriptors}))
 
 (defn generate-attribute
   [a-id a-name a-flags type]
-  {:a-id (Integer/valueOf a-id)
-   :a-name a-name
-   :a-flags (Integer/valueOf a-flags)
+  {:id (Integer/valueOf a-id)
+   :name a-name
+   :flags (Integer/valueOf a-flags)
    :type (Integer/valueOf type)})
 
 (defn generate-index-descriptor
@@ -84,49 +90,55 @@
 (defn read-header
    [db-title]
    (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
-   (.seek raf META-TABLE-BYTES-LENGTH)
-   (let [buf (byte-array (read-header-size db-title))
-         _ (.read raf buf)]
-     (nippy/thaw buf))))
+     (.seek raf INTEGER-BYTES-LENGTH)
+     (let [buf (byte-array (read-header-size db-title))
+           _ (.read raf buf)]
+       (nippy/thaw buf))))
 
 (defn get-header
   [db-title]
   (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
   (.seek raf 0)
   (let [length (.length raf)]
-  (if (< length META-TABLE-BYTES-LENGTH)
+  (if (< length INTEGER-BYTES-LENGTH)
    (generate-header)
    (read-header db-title)))))
 
 (defn read-page
-  [db-title table-id page-id]
+  [db-title offset]
   (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
+    (let [buf-page-size (byte-array INTEGER-BYTES-LENGTH)
+          page-size (do
+            (.seek raf offset)
+            (.read raf buf-page-size)
+            (nippy/thaw buf-page-size))
+          buf-page (byte-array page-size)
+          page (do
+            (.read raf buf-page)
+            (nippy/thaw buf-page))]
+      page)))
+
+(defn read-page-offset
+  [db-title table-name page-id]
   (let [header (get-header db-title)
         page-descriptor (->> header
-                             :table-descriptors
-                             (filter #(= table-id (:table-id %)))
-                             first
-                             :page-descriptors
-                             (filter #(= page-id (:page-id %)))
-                             first)
-        offset (:offset page-descriptor)
-        buf (byte-array PAGE-DESCRIPTOR-BYTES-LENGTH)]
-    (.seek raf offset)
-    (.read raf buf)
-    (nippy/thaw buf))))
+                       :table-descriptors
+                       (filter #(= table-name (:table-name %)))
+                       first
+                       :page-descriptors
+                       (filter #(= page-id (:page-id %)))
+                       first)
+        offset (:offset page-descriptor)]
+    offset))
 
-(defn get-page
-  [db-title table-id page-id]
-  (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
-  (let [length (.length raf)]
-  (if (> length PAGE-DESCRIPTOR-BYTES-LENGTH)
-   (generate-page table-id page-id)
-   (read-page db-title table-id page-id)))))
+(defn table-name->table-id
+  [db-title table-name]
+  (:table-id (get-table-descriptor db-title table-name)))
 
 (defn get-attributes
   [db-title table-name]
   (let [table-descriptors (:table-descriptors (get-header db-title))
-        attributes (filter #(= table-name (:table-name %)) table-descriptors)]
+        attributes (:attributes (first (filter #(= table-name (:table-name %)) table-descriptors)))]
         attributes))
 
 (defn calc-record-hash
@@ -139,26 +151,38 @@
                                current-attribute-flags (:flags current-attribute)
                                current-field (nth record i)
                                current-field-value-hash (hash (:value current-field))]
-                            (if (= (bit-and (current-attribute-flags FLAG-PRIMARY-KEY)) 1)
+                            (if (= (bit-and current-attribute-flags FLAG-PRIMARY-KEY) 1)
                                 (+ hash-acc current-field-value-hash) hash-acc)) attributes)
-          (Math/abs (quot (Math/abs hash-acc) PAGES-PER-TABLE)))))
+          (let [result (Math/abs (mod (Math/abs hash-acc) PAGES-PER-TABLE))]
+            (println (str ":: HASH " result))
+            result))))
 
 (defn write-header
   [db-title header]
   (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
    (.seek raf 0)
-   (let [;(read-header-size db-title)
-         data (nippy/freeze header)
+   (let [data (nippy/freeze header)
          size (count data)]
-  ; (shift-file (title->file db-title) (+ META-TABLE-BYTES-LENGTH old-size) (- size old-size))
+  ; (shift-file (title->file db-title) (+ INTEGER-BYTES-LENGTH old-size) (- size old-size))
    (.write raf (nippy/freeze size))
    (.write raf data)
    (if (<= (.length raf) PAGE-SIZE) ;TODO header does not have to be more than 1,0Kb
       (.setLength raf PAGE-SIZE)))))
 
 (defn write-page
-  [db-title page]
+  [db-title offset page]
   (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
+    (.seek raf offset)
+    (let [data (nippy/freeze page)
+          size (count data)
+          ; recalc file length
+          length (.length raf)
+          length-reminder (rem (.length raf) PAGE-SIZE)
+          new-file-length (+ (- PAGE-SIZE length-reminder) length)]
+          (.write raf (nippy/freeze size))
+          (.write raf data)
+          (.setLength raf new-file-length)
+          )))
 
 (defn add-table
   [db-title table-name attributes]
@@ -170,54 +194,172 @@
       (write-header db-title (generate-header (conj (header :table-descriptors) table-descriptor)))))
 
 (defn get-page-descriptors
-  [header table-name]
-  (->> header
-       :table-descriptors
-       (filter #(= table-name (:table-name %)))
-       first
-       :page-descriptors))
+  [db-title table-name]
+  (let [header (get-header db-title)]
+    (->> header
+         :table-descriptors
+         (filter #(= table-name (:table-name %)))
+         first
+         :page-descriptors)))
 
-(defn get-table-descriptor
-  [header table-name]
-  (->> header
-       :table-descriptors
+(defn read-table-descriptors
+ [db-title]
+ (let [header (get-header db-title)
+       table-descriptors (:table-descriptors header)]
+   table-descriptors))
+
+(defn read-table-descriptor
+  [db-title table-name]
+  (->> (read-table-descriptors db-title)
        (filter #(= table-name (:table-name %)))
        first))
 
 (defn get-table-id
-  [header table-name]
-  (->> header
-       :table-descriptors
-       (filter #(= table-name (:table-name %)))
-       first
-       :table-id))
+  [db-title table-name]
+  (let [header (get-header db-title)]
+    (->> header
+         :table-descriptors
+         (filter #(= table-name (:table-name %)))
+         first
+         :table-id)))
 
-(defn write-page-descriptor
-  [db-title table-id page-id]
+(defn read-page-descriptor
+  [db-title table-name page-id]
+  (let [header (read-header db-title)
+        page-descriptors (get-page-descriptors db-title table-name)
+        page-descriptor (first (filter #(= page-id (:page-id %)) page-descriptors))]
+    page-descriptor))
+
+(defn get-page-descriptor
+  [db-title table-name page-id]
+  (let [loaded-page-descriptor (read-page-descriptor db-title table-name page-id)]
+    (if (nil? loaded-page-descriptor)
+        (let [offset (calc-new-page-offset db-title)#_(+ PAGE-SIZE (* (count (get-page-descriptors db-title table-name)) PAGE-SIZE))]
+          (generate-page-descriptor page-id offset))
+        loaded-page-descriptor)))
+
+(defn get-file-length
+  [db-title]
   (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
-  (let [header (get-header db-title)
-        page-descriptor (first (filter #(= page-id (:page-id %)) (get-page-descriptors header table-name)))
-        table-descriptor (generate-table-descriptor )
-        offset (.length raf)]
-        (if (nil? page-descriptor)
-        (get-table-descriptor )
-        (generate-page-descriptor page-id offset))
+    (.length raf)))
 
-(comment
+(defn get-table-descriptors
+  [db-title]
+  (:table-descriptors (get-header db-title)))
+
+(defn calc-new-page-offset
+  [db-title]
+  (let [table-descriptors (get-table-descriptors db-title)
+        new-page-offset (+ PAGE-SIZE
+                          (* PAGE-SIZE (if (= 0 (count table-descriptors))
+                            0
+                            (if (= 1 (count table-descriptors))
+                              (count (:page-descriptors (nth table-descriptors 0)))
+                              (reduce (fn [acc ts] (+ acc ts))
+                                (map #(count (:page-descriptors %)) table-descriptors))))))]
+    (println new-page-offset)
+    new-page-offset))
+
+(defn add-page-descriptor
+  [db-title table-name table-id page-id]
+  (let [header (get-header db-title)
+        table-descriptors (read-table-descriptors db-title)
+        current-table-descriptor (read-table-descriptor db-title table-name)
+        offset (calc-new-page-offset db-title)
+        page-descriptor (get-page-descriptor db-title table-name page-id)
+        filtered-table-descriptors (vec (filter #(not= table-name (:table-name %)) table-descriptors))
+        new-page-descriptors (conj (get-page-descriptors db-title table-name) page-descriptor)
+        new-table-descriptor (generate-table-descriptor
+            (:table-id current-table-descriptor)
+            (:table-name current-table-descriptor)
+            (:attributes current-table-descriptor)
+            (:index-descriptors current-table-descriptor)
+            new-page-descriptors)
+        new-table-descriptors (conj filtered-table-descriptors new-table-descriptor)
+        new-header (generate-header new-table-descriptors)]
+          (write-header db-title new-header)))
+
+(defn add-page
+  [db-title table-name table-id page-id]
+  (let [new-page (generate-page table-id page-id)
+        offset (calc-new-page-offset db-title)]
+    (add-page-descriptor db-title table-name table-id page-id)
+    (write-page db-title offset new-page)))
+
+(defn get-page
+  [db-title table-name page-id]
+  (let [page-offset (read-page-offset db-title table-name page-id)
+        table-id (get-table-id db-title table-name)
+        real-page-offset (if (nil? page-offset)
+            (do
+              (add-page db-title table-name table-id page-id)
+              (read-page-offset db-title table-name page-id))
+            page-offset)
+        loaded-page (read-page db-title real-page-offset)]
+          loaded-page))
+
 (defn insert
   [db-title table-name record]
   (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
-  (let [header (get-header db-title)
-        table-id (get-table-id header table-name)
-        page-descriptors (get-page-descriptors header table-name)
-        page-id (calc-record-hash db-title table-name record)]
- (if (some #(= page-id (:page-id %))
-    ; if table already has page with such id
-    (let [page (get-page db-title table-id page-id)]
-    (write-page-descriptor db-title table-id page-id)
-    (write-page (generate-page (:table-id page) (:page-id page) (conj records record))))
-    ; if table does not have the page
-
-   (generate-header (conj (header :table-descriptors) ,,,))))))))
+    (let [page-id (calc-record-hash db-title table-name record)
+          page (get-page db-title table-name page-id)
+          page-offset (read-page-offset db-title table-name page-id)]
+          (println (str "::PAGE-OFFSET " page-offset))
+          (let [updated-records (conj (:records page) record)]
+            (write-page db-title page-offset (generate-page (table-name->table-id db-title table-name) page-id updated-records)))
+    )))
 
         ;page (get-page db-title table-id 0 #_(calc-record-hash record))]
+
+(defn test-add-page-descriptor
+  [db-title table-name]
+  ; (println ">> add-page-descriptor")
+  ; (add-page-descriptor db-title table-name 0 0)
+  ; (println ">> add-page-descriptor")
+  ; (add-page-descriptor db-title table-name 1 1)
+  (println ">> read-header")
+  (println (read-header db-title)))
+
+(defn test
+  []
+  (let [db-title "test"
+        table-name "test-db-name"
+        attributes [(generate-attribute 0 "an" 1 0)
+                    (generate-attribute 1 "attribute" 1 1)]]
+    (delete-database db-title)
+    (initialize-database db-title)
+    (add-table db-title table-name attributes)
+    (println ">> read-header")
+    (println (read-header db-title))
+    (test-add-page-descriptor db-title table-name)
+    (insert db-title table-name [(generate-field 0 "this")
+                                 (generate-field 1 "1$")])
+    (insert db-title table-name [(generate-field 0 "t$hi")
+                                (generate-field 1 "##1")])
+    (println ">> get-page")
+    (println (str "> " (get-page db-title table-name 1)))
+    (println ">> get-page")
+    (println (str "> " (get-page db-title table-name 9)))
+  ))
+
+(defn test2
+  []
+  (let [db-title "test"
+        table-name "test-db-name2"
+        attributes [(generate-attribute 0 "an" 1 0)
+                    (generate-attribute 1 "attribute" 1 1)]]
+    ; (delete-database db-title)
+    ; (initialize-database db-title)
+    (add-table db-title table-name attributes)
+    (println ">> read-header")
+    (println (read-header db-title))
+    (test-add-page-descriptor db-title table-name)
+    (insert db-title table-name [(generate-field 0 "!!!")
+                                 (generate-field 1 "@@@")])
+    (insert db-title table-name [(generate-field 0 "$$$")
+                                (generate-field 1 "%%%")])
+    (println ">> get-page")
+    (println (str "> " (get-page db-title table-name 32)))
+    (println ">> get-page")
+    (println (str "> " (get-page db-title table-name 8)))
+  ))
