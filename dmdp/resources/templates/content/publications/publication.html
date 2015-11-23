@@ -7,10 +7,10 @@ Pubication: {{ publication.title }}
 {% block content %}
     <div class="content">
         Title: {{ publication.title }} </br>
-        Uploaded: {{ publication.date_created|date:"yyyy-MM-dd" }} </br>
-        Last update: {{ publication.date_updated|date:"yyyy-MM-dd" }} ({{ publication.date_updated|from-today }})</br>
+        Uploaded: {{ publication.date_created }} </br>
+        Last update: {{ publication.date_updated }}</br>
         {% if publication.journal_ref|empty? %}{% else %} Journal reference: {{ publication.journal_ref }} </br> {% endif %}
-        {% if publication.abstract|empty? %}Abstract thesis: </br> {{ publication.abstract }} </br>  {% endif %}
+        {% if publication.abstract|empty? %}{% else %} Abstract thesis: {{ publication.abstract }} </br>  {% endif %}
         {% if publication.doi|empty? %}DOI: {{ publication.doi }} </br>  {% endif %}
         {% if publication.comments|empty? %}Comments: {{ publication.comments }} </br>  {% endif %}
 

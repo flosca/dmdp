@@ -3,7 +3,7 @@
             [dmdp.layout :refer [error-page]]
             [dmdp.routes.home :refer [private-routes public-routes]]
             [dmdp.middleware :as middleware]
-            [dmdp.db.core :as db]
+            ;[dmdp.db.core :as db]
             [compojure.route :as route]
             [taoensso.timbre :as timbre]
             [taoensso.timbre.appenders.3rd-party.rotor :as rotor]
@@ -25,7 +25,7 @@
                            :backlog 10})}})
 
   (if (env :dev) (parser/cache-off!))
-  (db/connect!)
+  ;(db/connect!)
   (timbre/info (str
                  "\n-=[dmdp started successfully"
                  (when (env :dev) " using the development profile")
@@ -36,7 +36,7 @@
    shuts down, put any clean up code here"
   []
   (timbre/info "dmdp is shutting down...")
-  (db/disconnect!)
+;  (db/disconnect!)
   (timbre/info "shutdown complete!"))
 
 #_(def app

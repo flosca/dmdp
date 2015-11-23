@@ -39,4 +39,3 @@
   (POST "/auth/login" req (auth/login! req))
   (GET "/auth/not-admin" [] (auth/not-admin-page))
   (GET "/auth/logout" req (auth/logout-page req)))
-

@@ -355,26 +355,29 @@
     (map #(map (fn [c] (field->hash-map db-title table-name c)) %) (projection db-title table-name attributes)))))
 
 
-(defn pred-equality
-  [value]
-  (= value "Vasya"))
-
-  (defn pred-equality1
-    [value]
-    (= value 1))
-
 (defn select
-  [db-title table-name attr-preds]
+  ([db-title table-name attr-preds]
   (map #(apply merge %)
- (->> attr-preds
+  (->> attr-preds
   (map (fn [c]
-    (filter (fn [v] (println v) (some
+    (filter (fn [v] (some
        #(and (= (first c) (:attribute-id %))
              ((second c) (:value %))) v)) (projection db-title table-name))))
   (map set)
   (reduce clojure.set/intersection)
   (vec)
   (map (fn [e] (map #(field->hash-map db-title table-name %) e))))))
+([db-title table-name attr-preds set-pred]
+  (map #(apply merge %)
+  (->> attr-preds
+  (map (fn [c]
+    (filter (fn [v] (some
+       #(and (= (first c) (:attribute-id %))
+             ((second c) (:value %))) v)) (projection db-title table-name))))
+  (map set)
+  (reduce (if (= set-pred "or") clojure.set/union clojure.set/intersection))
+  (vec)
+  (map (fn [e] (map #(field->hash-map db-title table-name %) e)))))))
 
 
 (defn nat-join
@@ -407,7 +410,7 @@
   (println ">> read-header")
   (println (read-header db-title)))
 
-(defn test
+(defn test1
   []
   (let [db-title "test"
         table-name "test-db-name"

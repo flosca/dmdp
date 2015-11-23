@@ -1,7 +1,7 @@
 (ns dmdp.core
   (:require [dmdp.handler :refer [app init destroy]]
             [immutant.web :as immutant]
-            [dmdp.db.migrations :as migrations]
+            ;[dmdp.db.migrations :as migrations]
             [clojure.tools.nrepl.server :as nrepl]
             [taoensso.timbre :as timbre]
             [environ.core :refer [env]]
@@ -63,9 +63,5 @@
   (timbre/info "server started on port:" (:port @http-server)))
 
   (defn -main [& args]
-    (cond
-      (some #{"migrate" "rollback"} args) (migrations/migrate args)
-      :else
-           (do
   (start-app args)
-  #_(prepare-database))))
+  #_(prepare-database))

@@ -20,9 +20,8 @@ Pubications
     {% for publication in publications %}
         <div class="content">
             <a href="/content/publications/{{ publication.id }}">{{ publication.title }}</a> </br>
-            Created: {{ publication.date_created|date:"yyyy-MM-dd" }}</br>
-            Updated: {{ publication.date_updated|date:"yyyy-MM-dd" }}
-                         ({{ publication.date_updated|from-today }})</br>
+            Created: {{ publication.date_created }}</br>
+            Updated: {{ publication.date_updated }}</br>
            {% if publication.journal_ref|empty? %} {% else %} Journal ref.: {{ publication.journal_ref }} {% endif %}
         </div>
     {% endfor %}

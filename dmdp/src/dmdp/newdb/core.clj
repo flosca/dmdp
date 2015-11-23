@@ -58,18 +58,19 @@
 
 (defn get-user
   [params]
-  (select "data" "dmd.users" [[0 (fn [v] (= v (:id params)))]]))
+  (select "data" "dmd.users" [[0 #(= (Integer/valueOf (:id params)) %)]]))
 
 
 (defn get-user-by-email
   [params]
   (println params)
-  (select "data" "dmd.users" [[3 (fn [v] (= v (:email params)))]]))
+  (select "data" "dmd.users" [[3 #(= (:email params) %)]]))
 
 
 (defn update-user!
   []
   )
+
 
 (defn create-user!
   [params]
@@ -91,40 +92,78 @@
 
 
 (defn search-author-by-name
-  [])
+  [params]
+  (select "data" "dmd.authors" [[1 #(like (:keyname params) %)]
+                                [2 #(like (:forenames params) %)]] "or"))
 
 (defn get-category-name-by-id
   [])
 
 (defn get-categories
-  [])
+  []
+  (project "data" "dmd.categories"))
 
-(defn get-authors [])
+(defn get-authors [params]
+  (take (:limit params) (drop (:offset params) (project "data" "dmd.authors"))))
 
-(defn get-publications-by-author [])
+(defn get-publications-by-author [params]
+  (mapcat (fn [e] (select "data" "dmd.publications" [[0 #(= e %)]]))
+  (map :publication_id (select "data" "dmd.author_of" [[0 #(= (Integer/valueOf (:author_id params)) %)]]))))
 
 
-(defn get-publications [])
+(defn get-publications
+  [params]
+  (take (:limit params) (drop (:offset params) (project "data" "dmd.publications"))))
 
-(defn get-publication [params]
-  (select "data" "dmd.publications" [[0 (fn [v] (= v (:id params)))]]))
+(defn get-publication [id]
+  (select "data" "dmd.publications" [[0 #(= (Integer/valueOf id) %)]]))
 
-(defn get-authors-of-publication [params])
+(defn get-authors-of-publication [params]
+  (mapcat (fn [e] (select "data" "dmd.authors" [[0 #(= e %)]]))
+  (map :author_id (select "data" "dmd.author_of" [[1 #(= (Integer/valueOf (:pub_id params)) %)]]))))
 
 (defn get-publication-categories [params])
 
-(defn check-admin-user [])
+(defn check-admin-user [id]
+  (:admin (first (select "data" "dmd.users" [[0 #(= (Integer/valueOf id) %)]]))))
 
-(defn create-publication [])
+
+(defn create-publication [params]
+  (let [id (rand-int 1000)]
+  (insert "data" "dmd.publications"
+     [(generate-field 0 id)
+      (generate-field 1 (:uid params))
+      (generate-field 2 (:title params))
+      (generate-field 3 (:date_created params))
+      (generate-field 4 (:date_updated params))
+      (generate-field 5 (:journal_ref params))
+      (generate-field 6 (:abstract params))
+      (generate-field 7 (:doi params))
+      (generate-field 8 (:isbn params))
+      (generate-field 9 (:comments params))])
+    id))
 
 
-(defn create-author [])
+(defn create-author [params]
+  (let [id (rand-int 1000)]
+  (insert "data" "dmd.authors"
+     [(generate-field 0 id)
+      (generate-field 1 (:keyname params))
+      (generate-field 2 (:forenames params))
+      (generate-field 3 (:affiliation params))])
+      id))
 
-(defn bind-publication-to-author! [])
+(defn bind-publication-to-author! [params]
+  (insert "data" "dmd.author_of"
+     [(generate-field 0 (:author_id params))
+      (generate-field 1 (:publication_id params))]))
 
 (defn update-publication! [])
 
 (defn get-publications-by-title
-[])
+[params]
+ (take (:limit params) (drop (:offset params) (select "data" "dmd.publications" [[2 #(like (:title params) %)]]))))
 
-(defn get-author [])
+(defn get-author
+  [params]
+  (select "data" "dmd.authors" [[0 #(= (Integer/valueOf (:id params)) %)]]))
