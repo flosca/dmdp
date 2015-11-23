@@ -8,6 +8,16 @@ Content management system for storing scientific publications.
 
 Be sure that you have latest version of Java and Leiningen.
 
+If you have a standalone version of application:
+
+## Usage
+
+	1. Just run "java -jar dmdp.jar" and go to localhost:3000
+
+	2. We also upload small dump (tables/data.db) from 1k records for demonstration basic functional.
+
+	3. Contact us (emails at report) if you have any problem with it.
+
 ## License
 
 Copyright © Vladislav Skukov, Maxim Skoriukov
