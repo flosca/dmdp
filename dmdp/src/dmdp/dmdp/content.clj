@@ -18,9 +18,7 @@
      "content/search.html" {:identity (:identity session)})
       (let [limit (Integer/parseInt (:limit params "20"))
             offset (Integer/parseInt (:offset params "0"))
-            title (let [query (:q params)
-            _ (println (db/search-author-by-name {:keyname (str (:q params))
-                                                 :forenames (str (:q params))}))] (if (= nil query) nil (str query)))
+            title (let [query (:q params)] (if (= nil query) nil (str query)))
             category_id (let [category (:category params)] (if (= category nil) nil (Integer/parseInt category)))]
       (layout/render
        "content/search.html" {:publications
@@ -101,11 +99,22 @@
         user-id (:id (:identity session nil) nil)]
   (if (not= user-id nil)
     (layout/render
-     "content/publications/publication.html" {:publication (first (db/get-publication pub-id))
+     "content/publications/publication.html" {:user (first (db/get-user {:id user-id}))
+                                              :publication (first (db/get-publication pub-id))
                                               :authors (db/get-authors-of-publication {:pub_id pub-id})
                                               :categories (db/get-publication-categories {:publication_id pub-id})
                                               :identity (:identity session)})
       (redirect "/auth/login"))))
+
+(defn delete-publication!  [{:keys [params session]}]
+  (let [id (:id (:identity session nil) nil)]
+    (if (and (not= id nil) (db/check-admin-user id))
+  (do
+    (println params)
+    (db/delete-publication params)
+    (redirect "/"))
+    (redirect "/auth/not-admin"))))
+
 
 
 (defn new-publication-page [{:keys [params session]}]
@@ -127,10 +136,10 @@
 
 (defn edit-publication-page [{:keys [params session]}]
 (let [id (:id (:identity session nil) nil)]
-    (if (and (not= id nil) (db/check-admin-user {:id id}))
+    (if (and (not= id nil) (db/check-admin-user id))
       (layout/render
          "content/publications/edit_publication.html" {:user (first (db/get-user {:id (:id (:identity session))}))
-                                                       :publication (first (db/get-publication {:id (Integer/valueOf (:id params))}))
+                                                       :publication (first (db/get-publication id))
                                                        :identity (:identity session)})
       (redirect (str "/content/publications/" (:id params))))))
 

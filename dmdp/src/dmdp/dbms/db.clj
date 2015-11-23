@@ -380,6 +380,14 @@
   (map (fn [e] (map #(field->hash-map db-title table-name %) e)))))))
 
 
+(defn remove-record
+  [db-title table-name record]
+  (let [page-id (calc-record-hash db-title table-name record)
+        record-page (get-page db-title table-name page-id)
+        table-id (get-table-id db-title table-name)
+        new-page (generate-page table-id page-id (set (filter #(not= record %) (:records record-page))))]
+    (write-page db-title (read-page-offset db-title table-name page-id) new-page)))
+
 (defn nat-join
   [db-title table-name-1 table-name-2]
   (let [records-1 (project db-title table-name-1)

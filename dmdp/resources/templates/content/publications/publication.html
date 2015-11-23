@@ -27,6 +27,9 @@ Pubication: {{ publication.title }}
         {% endfor %}
 
 
-{% if user.admin %} <h3><a href="/content/publications/{{ publication.id }}/edit"> Edit publication </a></h3> {% else %} {% endif %}
+{% if user.admin %} <h3><a href="/content/publications/{{ publication.id }}/edit"> Edit publication </a></h3></br>
+                    <h3><form method="post">{% csrf-field %}
+                        <input type="submit" value="Delete publication"/></form></h3> {% else %} {% endif %}
+
     </div>
 {% endblock %}

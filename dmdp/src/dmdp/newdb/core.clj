@@ -104,7 +104,8 @@
   (project "data" "dmd.categories"))
 
 (defn get-authors [params]
-  (take (:limit params) (drop (:offset params) (project "data" "dmd.authors"))))
+  (take (:limit params) (drop (:offset params)
+  (sort-by :keyname (project "data" "dmd.authors")))))
 
 (defn get-publications-by-author [params]
   (mapcat (fn [e] (select "data" "dmd.publications" [[0 #(= e %)]]))
@@ -113,7 +114,8 @@
 
 (defn get-publications
   [params]
-  (take (:limit params) (drop (:offset params) (project "data" "dmd.publications"))))
+  (take (:limit params) (drop (:offset params)
+  (sort-by :title (project "data" "dmd.publications")))))
 
 (defn get-publication [id]
   (select "data" "dmd.publications" [[0 #(= (Integer/valueOf id) %)]]))
@@ -158,12 +160,25 @@
      [(generate-field 0 (:author_id params))
       (generate-field 1 (:publication_id params))]))
 
-(defn update-publication! [])
+(defn update-publication! [params])
 
 (defn get-publications-by-title
 [params]
- (take (:limit params) (drop (:offset params) (select "data" "dmd.publications" [[2 #(like (:title params) %)]]))))
+ (take (:limit params) (drop (:offset params) (sort-by :title
+   (select "data" "dmd.publications" [[2 #(like (:title params) %)]])))))
 
 (defn get-author
   [params]
   (select "data" "dmd.authors" [[0 #(= (Integer/valueOf (:id params)) %)]]))
+
+
+;; Delete Queries
+
+(defn delete-publication
+  [params]
+  (let [record
+    (reduce (fn [c v]
+      (filter #(and (= 0 (:attribute-id %))
+                    (= (:id params) (:value %))) v) c)
+       (projection "data" "dmd.publications"))]
+  (remove-record "data" "dmd.publications" record)))

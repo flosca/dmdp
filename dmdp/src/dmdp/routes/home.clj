@@ -26,7 +26,10 @@
   (GET "/content/authors" req (content/authors-page req))
   (GET "/content/authors/:id" req (content/author-page req))
   (GET "/content/publications" req (content/publications-page req))
+
   (GET "/content/publications/:id" req (content/publication-page req))
+  (POST "/content/publications/:id" req (content/delete-publication! req))
+
   (GET "/content/publications/:id/edit" req (content/edit-publication-page req))
   (POST "/content/publications/:id/edit" req (content/edit-publication! req))
 
