@@ -6,16 +6,6 @@ Pubications
 
 {% block content %}
     <h1>Publications:</h1>
-    <form>
-        Sort by:
-        <select name="sort_by">
-          <option value="title-asc" {% ifequal sort_by "title-asc" %}selected{% endifequal %}>Title (A-Z)</option>
-          <option value="title-desc" {% ifequal sort_by "title-desc" %}selected{% endifequal %}>Title (Z-A)</option>
-          <option value="date_updated-asc" {% ifequal sort_by "date_updated-asc" %}selected{% endifequal %}>Date updated (A-Z)</option>
-          <option value="date_updated-desc" {% ifequal sort_by "date_updated-desc" %}selected{% endifequal %}>Date updated (Z-A)</option>
-        </select>
-        <input value="Sort" type="submit"/>
-    </form>
     </br>
     {% for publication in publications %}
         <div class="content">

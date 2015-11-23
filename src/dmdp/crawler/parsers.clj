@@ -145,11 +145,11 @@
             :date_updated (get-date-updated record)))
 
 (def p-atom (atom 1))
-(def a-atom (atom 0))
+(def a-atom (atom 1))
 
 (defn parse-dblp
-[]
-(doseq [seq (take 1000 (:content (xml->coll "tables/dblp.xml")))
+[path-to-xml]
+(doseq [seq (take 1000 (:content (xml->coll path-to-xml)))
          :when (article? seq)]
  (db/execute-query p-atom
                    a-atom

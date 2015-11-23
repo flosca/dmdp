@@ -64,13 +64,10 @@
 
 (defn get-user-by-email
   [params]
-  (println params)
   (select "data" "dmd.users" [[3 #(= (:email params) %)]]))
 
 
-(defn update-user!
-  []
-  )
+(defn update-user! [])
 
 
 (defn create-user!
@@ -84,18 +81,17 @@
                               (generate-field 6 (:salt params))]))
 
 
-(defn get-publications-by-title-from-category
-  [])
+(defn get-publications-by-title-from-category [])
 
 
-(defn get-publications-from-category-by-category-id
-  [])
+(defn get-publications-from-category-by-category-id [])
 
 
 (defn search-author-by-name
   [params]
+  (take (:limit params) (drop (:offset params)
   (select "data" "dmd.authors" [[1 #(like (:keyname params) %)]
-                                [2 #(like (:forenames params) %)]] "or"))
+                                [2 #(like (:forenames params) %)]] "or"))))
 
 (defn get-category-name-by-id
   [])
@@ -132,7 +128,7 @@
 
 
 (defn create-publication [params]
-  (let [id (rand-int 1000)]
+  (let [id (inc (count (project "data" "dmd.publications")))]
   (insert "data" "dmd.publications"
      [(generate-field 0 id)
       (generate-field 1 (:uid params))
@@ -148,7 +144,7 @@
 
 
 (defn create-author [params]
-  (let [id (rand-int 1000)]
+  (let [id (inc (count (project "data" "dmd.authors")))]
   (insert "data" "dmd.authors"
      [(generate-field 0 id)
       (generate-field 1 (:keyname params))
@@ -178,7 +174,7 @@
 (defn delete-publication
   [params]
   (let [record
-    (filter #(some (fn [b] (and (= (:attribute-id b) 0)
+    (first (filter #(some (fn [b] (and (= (:attribute-id b) 0)
                                 (= (:value b) (Integer/valueOf (:id params))))) %)
-       (projection "data" "dmd.publications"))]
+       (projection "data" "dmd.publications")))]
   (remove-record "data" "dmd.publications" record)))

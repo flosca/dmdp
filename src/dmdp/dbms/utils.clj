@@ -7,12 +7,16 @@
 [title]
 (str "tables/" title ".db"))
 
+(defn exists?
+  [title]
+  (.exists (io/as-file (title->file title))))
+
 (defn initialize-database
 "Creates a single file containing all the information about created database."
 [title]
 (let [file (title->file title)]
-(if (.exists (io/as-file file))
-(println "File already exists.")
+(if (exists? title)
+(do (println "File already exists.") nil)
 (do
 (io/make-parents file)
 (spit file "")))))
@@ -21,9 +25,9 @@
 "Drops a file if exists."
 [title]
 (let [file (title->file title)]
-(if (.exists (io/as-file file))
+(if (exists? title)
 (io/delete-file file)
-(println "File does not exist yet."))))
+(do (println "File does not exist yet.") nil))))
 
 (defn like [value w-here]
   (not (nil? (re-matches (re-pattern (str "(?i)" ".*" value ".*")) w-here))))

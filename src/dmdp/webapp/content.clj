@@ -7,10 +7,8 @@
             [clojure.string :refer [split]]))
 
 (defn home-page [{:keys [session]}]
-;(println (:id (:identity session)))
   (layout/render
-    "home.html" {:identity (:identity session)})
-    )
+    "home.html" {:identity (:identity session)}))
 
 (defn search-page [{:keys [params session]}]
   (if (empty? params)
@@ -18,29 +16,20 @@
      "content/search.html" {:identity (:identity session)})
       (let [limit (Integer/parseInt (:limit params "20"))
             offset (Integer/parseInt (:offset params "0"))
-            title (let [query (:q params)] (if (= nil query) nil (str query)))
-            category_id (let [category (:category params)] (if (= category nil) nil (Integer/parseInt category)))]
+            title (let [query (:q params)] (if (= nil query) nil (str query)))]
       (layout/render
        "content/search.html" {:publications
                               (cond
-                               (and (not= category_id nil) (not= title nil)) (db/get-publications-by-title-from-category
-                                                                                                  {:category_id category_id
-                                                                                                   :title title
-                                                                                                   :limit limit
-                                                                                                   :offset offset}) ; by title and category
-                               (not= category_id nil) (db/get-publications-from-category-by-category-id
-                                                       {:category_id category_id
-                                                        :limit limit
-                                                        :offset offset})
                                (not= title nil)
                                  (db/get-publications-by-title {:title title
-                                                                               :limit limit
-                                                                               :offset offset})
+                                                                :limit limit
+                                                                :offset offset})
                                :else (do (println "No filter!\n") []))
-                             :authors (db/search-author-by-name {:keyname (str (:q params)) :forenames (str (:q params))})
+                             :authors (db/search-author-by-name {:keyname (str (:q params))
+                                                                 :forenames (str (:q params))
+                                                                 :limit limit
+                                                                 :offset offset})
                              :query (:q params)
-                             :category_name (if (= category_id nil) nil (:category_name (first (db/get-category-name-by-id {:id category_id}))))
-                             :category_id category_id
                              :identity (:identity session)
                              :prev_page_offset (if (< (- offset limit) 0) 0 (- offset limit))
                              :next_page_offset (+ offset limit)}))))
@@ -110,9 +99,8 @@
   (let [id (:id (:identity session nil) nil)]
     (if (and (not= id nil) (db/check-admin-user id))
   (do
-    (println params)
     (db/delete-publication params)
-    (redirect "/"))
+    (redirect "/content/publications"))
     (redirect "/auth/not-admin"))))
 
 

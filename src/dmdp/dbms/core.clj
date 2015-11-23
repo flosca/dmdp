@@ -13,13 +13,12 @@
 (def FLAG-PRIMARY-KEY 1)
 ; ------------------------------------------
 ; ---- OTHER CONSTANTS
-(def PAGES-PER-TABLE 37)
+(def PAGES-PER-TABLE 67)
 (def PAGE-SIZE (* 4 1024))
 (def HEADER-SIZE (* 64 1024))
 ;-------------------------------------------
 
 (defn read-header-size
-  "Returns the size of this shit"
   [db-title]
   (with-open [raf (new java.io.RandomAccessFile (title->file db-title) "rwd")]
      (.seek raf 0)
@@ -92,7 +91,6 @@
                             (if (= (bit-and current-attribute-flags FLAG-PRIMARY-KEY) 1)
                                 (+ hash-acc current-field-value-hash) hash-acc)) attributes)
           (let [result (Math/abs (mod (Math/abs hash-acc) PAGES-PER-TABLE))]
-            (println (str ":: HASH " result))
             result))))
 
 (defn write-header
@@ -115,12 +113,11 @@
           ; recalc file length
           length (.length raf)
           diff-length (- length HEADER-SIZE)
-          length-remainder (rem (.length raf) PAGE-SIZE)
-          new-file-length (+ (- PAGE-SIZE length-remainder) diff-length)]
+          length-remainder (rem diff-length PAGE-SIZE)
+          new-file-length (+ (- PAGE-SIZE length-remainder) diff-length HEADER-SIZE)]
           (.write raf (nippy/freeze size))
           (.write raf data)
-          (.setLength raf new-file-length)
-          )))
+          (.setLength raf new-file-length))))
 
 (declare read-table-descriptor)
 
@@ -208,7 +205,6 @@
                               (count (:page-descriptors (nth table-descriptors 0)))
                               (reduce (fn [acc ts] (+ acc ts))
                                 (map #(count (:page-descriptors %)) table-descriptors))))))]
-    (println new-page-offset)
     new-page-offset))
 
 (defn add-page-descriptor
@@ -254,7 +250,6 @@
     (let [page-id (calc-record-hash db-title table-name record)
           page (get-page db-title table-name page-id)
           page-offset (read-page-offset db-title table-name page-id)]
-          (println (str "::PAGE-OFFSET " page-offset))
           (let [updated-records (conj (:records page) record)]
             (write-page db-title page-offset (generate-page (table-name->table-id db-title table-name) page-id updated-records)))))
 

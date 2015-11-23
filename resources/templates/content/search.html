@@ -26,8 +26,7 @@ Search {% if query %}: query = {{ query }} {% endif %}
                 <a href="/content/publications/{{ publication.id }}"> {{ publication.title }} </a> </br>
             {% endfor %} </br>
 
-            <a href="/content/search?{% if query %}q={{ query }}{% endif %}{% if category_id %}&category={{ category_id }}{% endif %}{% if prev_page_offset %}&offset={{ prev_page_offset }}{% endif %}">&lt;&lt; Previous page</a>
-            <a class="float-right" href="/content/search?{% if query %}q={{ query }}{% endif %}{% if category_id %}&category={{ category_id }}{% endif %}{% if next_page_offset %}&offset={{ next_page_offset }}{% endif %}">Next page &gt;&gt;</a>
+
         {% else %}
             No results for your query. </br>
           </br>
@@ -45,11 +44,16 @@ Search {% if query %}: query = {{ query }} {% endif %}
           {% if authors|length > 0 %}
               {% for author in authors %}
                   <a href="/content/authors/{{ author.id }}"> {{ author.keyname }} {{ author.forenames }} </a> </br>
-              {% endfor %} </br>
+                  {% endfor %} </br> </br>
+
+
+              {% else %}
+                  No results for your query. </br>
+                </br>
               {% endif %}
-
             <hr/>
-
+            <a href="/content/search?{% if query %}q={{ query }}{% endif %}{% if category_id %}&category={{ category_id }}{% endif %}{% if prev_page_offset %}&offset={{ prev_page_offset }}{% endif %}">&lt;&lt; Previous page</a>
+            <a class="float-right" href="/content/search?{% if query %}q={{ query }}{% endif %}{% if category_id %}&category={{ category_id }}{% endif %}{% if next_page_offset %}&offset={{ next_page_offset }}{% endif %}">Next page &gt;&gt;</a>
 
     {% endif %}
 
