@@ -7,7 +7,8 @@
 (defn prepare-database
   []
 (let [db-title "data"]
-  (delete-database db-title)
+(if (exists? db-title) nil
+ (do
   (initialize-database db-title)
 
  ; Publication tables
@@ -52,7 +53,7 @@
     (generate-attribute 3 "email" 0 0)
     (generate-attribute 4 "admin" 0 0)
     (generate-attribute 5 "pass" 0 0)
-    (generate-attribute 6 "salt" 0 0)])))
+    (generate-attribute 6 "salt" 0 0)])))))
 
 
 ;; Queries

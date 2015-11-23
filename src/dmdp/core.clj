@@ -65,5 +65,5 @@
 (defn -main [& args]
  (do
   (prepare-database)
-  (parse-dblp)
+  #_(parse-dblp args) ; uncomment if you want to parse records from dblp.xml 
   (start-app args)))
