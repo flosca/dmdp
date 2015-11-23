@@ -1,9 +1,9 @@
-(ns dmdp.dmdp.content
+(ns dmdp.webapp.content
   (:require [dmdp.layout :as layout]
-            [dmdp.newdb.core :as db]
+            [dmdp.dbms.queries :as db]
             [clojure.java.io :as io]
             [ring.util.response :refer [redirect response]]
-            [dmdp.dmdp.validators :as validators]
+            [dmdp.webapp.validators :as validators]
             [clojure.string :refer [split]]))
 
 (defn home-page [{:keys [session]}]

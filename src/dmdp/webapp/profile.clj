@@ -1,8 +1,8 @@
-(ns dmdp.dmdp.profile
+(ns dmdp.webapp.profile
   (:require [dmdp.layout :as layout]
             [ring.util.response :refer [response redirect]]
-            [dmdp.newdb.core :as db]
-            [dmdp.dmdp.validators :as validators]))
+            [dmdp.dbms.queries :as db]
+            [dmdp.webapp.validators :as validators]))
 
 (defn profile-page [{:keys [params session]}]
   (let [id (:id (:identity session nil) nil)]

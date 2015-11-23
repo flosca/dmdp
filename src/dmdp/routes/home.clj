@@ -1,15 +1,9 @@
 (ns dmdp.routes.home
-  (:require [dmdp.layout :as layout]
-            [compojure.core :refer [defroutes GET POST]]
-            [compojure.route :as route]
-            [ring.util.http-response :refer [ok]]
-            [ring.util.response :refer [response redirect]]
-            [clojure.java.io :as io]
-            [dmdp.db.core :as db]
-            [dmdp.dmdp.content :as content]
-            [dmdp.dmdp.validators :as validators]
-            [dmdp.dmdp.auth :as auth]
-            [dmdp.dmdp.profile :as profile]))
+  (:require [compojure.core :refer [defroutes GET POST]]
+            [dmdp.webapp.content :as content]
+            [dmdp.webapp.validators :as validators]
+            [dmdp.webapp.auth :as auth]
+            [dmdp.webapp.profile :as profile]))
 
 ; Routes
 

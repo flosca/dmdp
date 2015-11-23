@@ -1,11 +1,10 @@
 (ns dmdp.core
   (:require [dmdp.handler :refer [app init destroy]]
             [immutant.web :as immutant]
-            ;[dmdp.db.migrations :as migrations]
             [clojure.tools.nrepl.server :as nrepl]
             [taoensso.timbre :as timbre]
             [environ.core :refer [env]]
-            [dmdp.newdb.core :refer [prepare-database]])
+            [dmdp.dbms.queries :refer [prepare-database]])
   (:gen-class))
 
 (defonce nrepl-server (atom nil))
@@ -64,4 +63,4 @@
 
   (defn -main [& args]
   (start-app args)
-  #_(prepare-database))
+  (prepare-database))

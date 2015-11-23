@@ -1,6 +1,7 @@
-(ns dmdp.newdb.core
+(ns dmdp.dbms.queries
   (:use
-    [dmdp.dbms.db]
+    [dmdp.dbms.core]
+    [dmdp.dbms.forms]
     [dmdp.dbms.utils]))
 
 (defn prepare-database

@@ -1,9 +1,9 @@
-(ns dmdp.dbms.db
+(ns dmdp.dbms.core
     (:require [taoensso.nippy :as nippy]
               [dmdp.dbms.join :refer [natural-join cross-join]])
-    (:use     [dmdp.dbms.utils]))
+    (:use     [dmdp.dbms.utils]
+              [dmdp.dbms.forms]))
 
-(defn reload [] (use 'clojuredb.db :reload)) ;; for simplified developing in repl
 
 ; ---- BYTES LENGTH FOR DIFFERENT DATA TYPES
 (def INTEGER-BYTES-LENGTH 9)
@@ -25,68 +25,6 @@
      (let [buf (byte-array INTEGER-BYTES-LENGTH)
            _ (.read raf buf)]
        (nippy/thaw buf))))
-
-(defn generate-header
-  ([]
-   {:table-descriptors []})
-  ([table-descriptors]
-   {:table-descriptors table-descriptors}))
-
-(defn generate-table-descriptor
-  ([table-id table-name attributes]
-    {:table-id (Integer/valueOf table-id)
-     :table-name table-name
-     :attributes attributes
-     :index-descriptors []
-     :page-descriptors []})
-  ([table-id table-name attributes index-descriptors page-descriptors]
-    {:table-id (Integer/valueOf table-id)
-     :table-name table-name
-     :attributes attributes
-     :index-descriptors index-descriptors
-     :page-descriptors page-descriptors}))
-
-(defn generate-attribute
-  [a-id a-name a-flags type]
-  {:id (Integer/valueOf a-id)
-   :name a-name
-   :flags (Integer/valueOf a-flags)
-   :type (Integer/valueOf type)})
-
-(defn generate-index-descriptor
-  []
-  {:attribute-desciptors []})
-
-(defn generate-attribute-descriptor
-  [id offset]
-  {:id (Integer/valueOf id)
-   :idx-offset (Integer/valueOf offset)})
-
-(defn generate-page-descriptor
-  [page-id offset]
-  {:page-id (Integer/valueOf page-id)
-   :offset  (Integer/valueOf offset)})
-
-(defn generate-page
-  ([table-id page-id records]
-    {:table-id (Integer/valueOf table-id)
-     :page-id (Integer/valueOf page-id)
-     :records records})
-  ([table-id page-id]
-    {:table-id (Integer/valueOf table-id)
-     :page-id (Integer/valueOf page-id)
-     :records #{}}))
-
-(defn generate-record
-  ([]
-  {:fields []})
-  ([fields]
-  {:fields fields}))
-
-(defn generate-field
- [attribute-id value]
-  {:attribute-id (Integer/valueOf attribute-id)
-   :value value})
 
 (defn read-header
    [db-title]

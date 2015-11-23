@@ -1,8 +1,8 @@
-(ns dmdp.dmdp.auth
+(ns dmdp.webapp.auth
   (:require [dmdp.layout :as layout]
             [ring.util.response :refer [response redirect]]
-            [dmdp.newdb.core :as db]
-            [dmdp.dmdp.validators :as validators]
+            [dmdp.dbms.queries :as db]
+            [dmdp.webapp.validators :as validators]
             [buddy.hashers :as hashers]))
 
 
