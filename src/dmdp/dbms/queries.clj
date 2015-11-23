@@ -178,8 +178,7 @@
 (defn delete-publication
   [params]
   (let [record
-    (reduce (fn [c v]
-      (filter #(and (= 0 (:attribute-id %))
-                    (= (:id params) (:value %))) v) c)
+    (filter #(some (fn [b] (and (= (:attribute-id b) 0)
+                                (= (:value b) (Integer/valueOf (:id params))))) %)
        (projection "data" "dmd.publications"))]
   (remove-record "data" "dmd.publications" record)))

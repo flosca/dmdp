@@ -4,6 +4,7 @@
             [clojure.tools.nrepl.server :as nrepl]
             [taoensso.timbre :as timbre]
             [environ.core :refer [env]]
+            [dmdp.crawler.parsers :refer [parse-dblp]]
             [dmdp.dbms.queries :refer [prepare-database]])
   (:gen-class))
 
@@ -61,6 +62,8 @@
   (start-http-server (http-port port))
   (timbre/info "server started on port:" (:port @http-server)))
 
-  (defn -main [& args]
-  (start-app args)
-  (prepare-database))
+(defn -main [& args]
+ (do
+  (prepare-database)
+  (parse-dblp)
+  (start-app args)))

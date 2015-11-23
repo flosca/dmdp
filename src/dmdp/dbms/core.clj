@@ -14,7 +14,8 @@
 ; ------------------------------------------
 ; ---- OTHER CONSTANTS
 (def PAGES-PER-TABLE 37)
-(def PAGE-SIZE 1024)
+(def PAGE-SIZE (* 4 1024))
+(def HEADER-SIZE (* 64 1024))
 ;-------------------------------------------
 
 (defn read-header-size
@@ -100,11 +101,10 @@
    (.seek raf 0)
    (let [data (nippy/freeze header)
          size (count data)]
-  ; (shift-file (title->file db-title) (+ INTEGER-BYTES-LENGTH old-size) (- size old-size))
    (.write raf (nippy/freeze size))
    (.write raf data)
-   (if (<= (.length raf) PAGE-SIZE) ;TODO header does not have to be more than 1,0Kb
-      (.setLength raf PAGE-SIZE)))))
+   (if (<= (.length raf) HEADER-SIZE)
+      (.setLength raf HEADER-SIZE)))))
 
 (defn write-page
   [db-title offset page]
@@ -114,8 +114,9 @@
           size (count data)
           ; recalc file length
           length (.length raf)
-          length-reminder (rem (.length raf) PAGE-SIZE)
-          new-file-length (+ (- PAGE-SIZE length-reminder) length)]
+          diff-length (- length HEADER-SIZE)
+          length-remainder (rem (.length raf) PAGE-SIZE)
+          new-file-length (+ (- PAGE-SIZE length-remainder) diff-length)]
           (.write raf (nippy/freeze size))
           (.write raf data)
           (.setLength raf new-file-length)
@@ -184,7 +185,7 @@
   [db-title table-name page-id]
   (let [loaded-page-descriptor (read-page-descriptor db-title table-name page-id)]
     (if (nil? loaded-page-descriptor)
-        (let [offset (calc-new-page-offset db-title) #_(+ PAGE-SIZE (* (count (get-page-descriptors db-title table-name)) PAGE-SIZE))]
+        (let [offset (calc-new-page-offset db-title)]
           (generate-page-descriptor page-id offset))
         loaded-page-descriptor)))
 
@@ -337,65 +338,3 @@
   (let [records-1 (project db-title table-name-1)
         records-2 (project db-title table-name-2)]
   (cross-join (set records-1) (set records-2))))
-
-
-
-
-
-;  (filter (fn [v] (pred v)) (project db-title table-name)))
-
-
-        ;page (get-page db-title table-id 0 #_(calc-record-hash record))]
-
-(defn test-add-page-descriptor
-  [db-title table-name]
-  ; (println ">> add-page-descriptor")
-  ; (add-page-descriptor db-title table-name 0 0)
-  ; (println ">> add-page-descriptor")
-  ; (add-page-descriptor db-title table-name 1 1)
-  (println ">> read-header")
-  (println (read-header db-title)))
-
-(defn test1
-  []
-  (let [db-title "test"
-        table-name "test-db-name"
-        attributes [(generate-attribute 0 "an" 1 0)
-                    (generate-attribute 1 "attribute" 1 1)]]
-    (delete-database db-title)
-    (initialize-database db-title)
-    (add-table db-title table-name attributes)
-    (println ">> read-header")
-    (println (read-header db-title))
-    (test-add-page-descriptor db-title table-name)
-    (insert db-title table-name [(generate-field 0 "this")
-                                 (generate-field 1 "1$")])
-    (insert db-title table-name [(generate-field 0 "t$hi")
-                                (generate-field 1 "##1")])
-    (println ">> get-page")
-    (println (str "> " (get-page db-title table-name 1)))
-    (println ">> get-page")
-    (println (str "> " (get-page db-title table-name 9)))
-  ))
-
-(defn test2
-  []
-  (let [db-title "test"
-        table-name "test-db-name2"
-        attributes [(generate-attribute 0 "an" 1 0)
-                    (generate-attribute 1 "attribute" 1 1)]]
-    ; (delete-database db-title)
-    ; (initialize-database db-title)
-    (add-table db-title table-name attributes)
-    (println ">> read-header")
-    (println (read-header db-title))
-    (test-add-page-descriptor db-title table-name)
-    (insert db-title table-name [(generate-field 0 "!!!")
-                                 (generate-field 1 "@@@")])
-    (insert db-title table-name [(generate-field 0 "$$$")
-                                (generate-field 1 "%%%")])
-    (println ">> get-page")
-    (println (str "> " (get-page db-title table-name 32)))
-    (println ">> get-page")
-    (println (str "> " (get-page db-title table-name 8)))
-  ))
