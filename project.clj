@@ -1,4 +1,4 @@
-(defproject dmdp "0.1.0-SNAPSHOT"
+(defproject dmdp "1.0.0"
 
   :description "Neat management system for storing scientific publications."
 
@@ -18,22 +18,19 @@
                  [bouncer "0.3.3"]
                  [prone "0.8.2"]
                  [org.clojure/tools.nrepl "0.2.11"]
-                 [org.webjars/bootstrap "3.3.5"]
-                 [org.webjars/jquery "2.1.4"]
                  [buddy "0.7.2"]
                  [migratus "0.8.7"]
                  [conman "0.2.1"]
-                 [org.postgresql/postgresql "9.4-1203-jdbc41"]
                  [org.immutant/web "2.1.0"]
                  [clj-time "0.11.0"]
+                 [org.clojure/data.xml "0.0.8"]
                  [com.taoensso/nippy "2.10.0"]]
 
   :min-lein-version "2.0.0"
   :uberjar-name "dmdp.jar"
-  :jvm-opts ["-server"]
+  :jvm-opts ^:replace ["-server"]
 
   :main dmdp.core
-  :migratus {:store :database}
 
   :plugins [[lein-environ "1.0.1"]
             [migratus-lein "0.2.0"]]
