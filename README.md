@@ -8,7 +8,7 @@ Content management system for storing scientific publications.
 
 Be sure that you have latest version of Java and Leiningen.
 
-If you have a standalone version of application:
+If you have a standalone version of application (download lastest release [here](https://github.com/flosca/dmdproject/releases/tag/v1.0.0)):
 
 ## Usage
 
