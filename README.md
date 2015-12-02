@@ -16,8 +16,6 @@ If you have a standalone version of application (download lastest release [here]
 
 	2. We also upload small dump (tables/data.db) from 1k records for demonstration basic functional.
 
-	3. Contact us (emails at report) if you have any problem with it.
-
 ## License
 
 Copyright © Vladislav Skukov, Maxim Skoriukov
